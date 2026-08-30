@@ -1,0 +1,282 @@
+import React, { useState } from 'react';
+import { 
+  MapPin, 
+  Phone, 
+  Clock, 
+  Mail, 
+  Send, 
+  MessageCircle, 
+  CheckCircle2,
+  Navigation
+} from 'lucide-react';
+import { InstagramIcon } from '../components/SocialIcons';
+import { SEO } from '../components/SEO';
+import { BackButton } from '../components/BackButton';
+import { SITE_CONFIG } from '../config/siteConfig';
+
+export const ContactPage = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    product: '',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.phone || !formData.name) {
+      alert('Please fill out your name and phone number.');
+      return;
+    }
+
+    const businessNumber = SITE_CONFIG.contact.whatsapp;
+    const textMsg = 
+`*Contact Form Message - Aruna Radios & Furniture*
+----------------------------------------
+👤 *Name:* ${formData.name.trim()}
+📱 *Phone:* ${formData.phone.trim()}
+🏷️ *Subject / Product:* ${formData.product.trim() || 'General Enquiry'}
+💬 *Message:* ${formData.message.trim() || 'Please contact me regarding current showroom offers.'}
+----------------------------------------
+_Sent from Website Contact Page_`;
+
+    setSubmitted(true);
+
+    setTimeout(() => {
+      window.open(`https://wa.me/${businessNumber}?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+    }, 500);
+  };
+
+  return (
+    <>
+      <SEO
+        title="Contact Us - Store Location & Hours in Jayankondam"
+        description="Get in touch with Aruna Radios & Furniture in Jayankondam. Phone numbers, showroom address, working hours, and Google Map directions."
+      />
+
+      <BackButton label="Back to Home" to="/" />
+
+      <section className="section-padding" style={{ paddingTop: '1rem' }}>
+        <div className="container">
+          <div className="section-header">
+            <span className="section-badge">We Are Here For You</span>
+            <h1 className="section-title">Visit or Contact Our Store</h1>
+            <p className="section-desc">
+              Have a question about a product, bulk wedding order, or warranty service? Reach out by phone, WhatsApp, or drop by our showroom.
+            </p>
+          </div>
+
+          <div className="contact-grid">
+            {/* Contact Details & Working Hours */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div className="contact-info-card">
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
+                  Showroom Contact Information
+                </h2>
+
+                <div className="info-row">
+                  <div className="info-icon-box">
+                    <MapPin size={22} />
+                  </div>
+                  <div className="info-content">
+                    <span className="info-label">Address</span>
+                    <span className="info-value">
+                      {SITE_CONFIG.contact.address.line1}<br />
+                      {SITE_CONFIG.contact.address.line2}<br />
+                      {SITE_CONFIG.contact.address.city}, {SITE_CONFIG.contact.address.state} - {SITE_CONFIG.contact.address.pincode}
+                    </span>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                      Landmark: {SITE_CONFIG.contact.address.landmark}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <div className="info-icon-box">
+                    <Phone size={22} />
+                  </div>
+                  <div className="info-content">
+                    <span className="info-label">Phone Numbers</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                      <a href={`tel:${SITE_CONFIG.contact.phone.replace(/\s+/g, '')}`} className="info-value" style={{ color: 'var(--primary)' }}>
+                        {SITE_CONFIG.contact.phone} (Primary Store Line)
+                      </a>
+                      <a href={`tel:${SITE_CONFIG.contact.altPhone.replace(/\s+/g, '')}`} className="info-value">
+                        {SITE_CONFIG.contact.altPhone} (Enquiry Hotline)
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <div className="info-icon-box">
+                    <Mail size={22} />
+                  </div>
+                  <div className="info-content">
+                    <span className="info-label">Email Support</span>
+                    <a href={`mailto:${SITE_CONFIG.contact.email}`} className="info-value">
+                      {SITE_CONFIG.contact.email}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <div className="info-icon-box">
+                    <Clock size={22} />
+                  </div>
+                  <div className="info-content">
+                    <span className="info-label">Business Hours</span>
+                    <span className="info-value">{SITE_CONFIG.contact.hours.weekday}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      {SITE_CONFIG.contact.hours.sunday}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <a
+                    href={SITE_CONFIG.contact.googleMapsDirectionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                    style={{ flex: 1 }}
+                  >
+                    <Navigation size={18} />
+                    <span>Get Directions</span>
+                  </a>
+
+                  <a
+                    href={SITE_CONFIG.contact.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                  >
+                    <InstagramIcon size={18} color="#E1306C" />
+                    <span>Instagram</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Embedded Google Map */}
+              <div className="map-container" style={{ height: '240px' }}>
+                <iframe
+                  title="Aruna Radios & Furniture Showroom Google Map"
+                  src={SITE_CONFIG.contact.googleMapsEmbedUrl}
+                  width="100%"
+                  height="100%"
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </div>
+
+            {/* In-Site Contact Form */}
+            <div className="contact-info-card">
+              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                Send Us a Direct Message
+              </h2>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                Fill out the quick form below and our store staff will connect with you with pricing and product information.
+              </p>
+
+              {submitted ? (
+                <div style={{
+                  padding: '2.5rem 1.5rem',
+                  textAlign: 'center',
+                  backgroundColor: 'var(--bg-tertiary)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--border-color)'
+                }}>
+                  <CheckCircle2 size={54} color="var(--success)" style={{ margin: '0 auto 1rem auto' }} />
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                    Message Ready on WhatsApp!
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', marginBottom: '1.25rem' }}>
+                    We've opened your enquiry directly on WhatsApp for instant confirmation.
+                  </p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    Send Another Message
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit}>
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="contact-name">
+                      Full Name <span style={{ color: '#dc2626' }}>*</span>
+                    </label>
+                    <input
+                      id="contact-name"
+                      type="text"
+                      className="form-control"
+                      placeholder="e.g. Ramesh Kumar"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="contact-phone">
+                      Phone Number <span style={{ color: '#dc2626' }}>*</span>
+                    </label>
+                    <input
+                      id="contact-phone"
+                      type="tel"
+                      className="form-control"
+                      placeholder="e.g. 94432 54321"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="contact-product">
+                      Interested Product / Category
+                    </label>
+                    <input
+                      id="contact-product"
+                      type="text"
+                      className="form-control"
+                      placeholder="e.g. Teakwood Bed, Mixie, Refrigerator, Sofa Set"
+                      value={formData.product}
+                      onChange={(e) => setFormData({ ...formData, product: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="contact-msg">
+                      Your Message or Questions
+                    </label>
+                    <textarea
+                      id="contact-msg"
+                      className="form-control"
+                      placeholder="Tell us what you are looking for (dimensions, preferred brand, wedding package, etc.)..."
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      rows={4}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-lg"
+                    style={{ width: '100%' }}
+                  >
+                    <Send size={18} />
+                    <span>Submit Enquiry &amp; Chat on WhatsApp</span>
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
