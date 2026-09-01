@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 65" width="180" height="65">
+  <!-- TTK Prestige brand badge -->
+  <rect x="15" y="12" width="150" height="42" rx="4" fill="#D8232A"/>
+  <text x="90" y="27" font-family="'Arial', sans-serif" font-size="8" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="3">TTK</text>
+  <text x="90" y="45" font-family="'Brush Script MT', 'Lucida Calligraphy', 'Segoe Script', cursive, sans-serif" font-size="21" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-style="italic">Prestige</text>
+</svg>

@@ -25,13 +25,25 @@ export const BrandMarquee = () => {
               boxShadow: `0 4px 12px ${brandColor}25`
             }}
           >
+            <img
+              src={brand.logo}
+              alt={`${brand.name} logo`}
+              className="brand-logo-img"
+              loading="lazy"
+              onError={(e) => {
+                // Fallback to text initials if image ever fails to load
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
             <div
               className="brand-initials-badge"
               style={{
+                display: 'none',
                 background: `linear-gradient(135deg, ${brandColor} 0%, #0f172a 100%)`
               }}
             >
-              {getInitials(brand.name)}
+              {brand.name.slice(0, 2).toUpperCase()}
             </div>
           </div>
           <span className="brand-rounded-name">{brand.name}</span>

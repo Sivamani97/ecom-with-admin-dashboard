@@ -1100,6 +1100,19 @@ textarea.form-control {
   box-shadow: 0 0 16px rgba(var(--primary-rgb), 0.3);
 }
 
+.brand-logo-img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  padding: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+  transition: transform var(--transition-fast);
+}
+
+.brand-rounded-card:hover .brand-logo-img {
+  transform: scale(1.08);
+}
+
 .brand-initials-badge {
   font-family: var(--font-display);
   font-weight: 900;

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 65" width="170" height="65">
+  <!-- Venus water drops emblem -->
+  <g transform="translate(15, 12)">
+    <path d="M16 4 C16 4, 6 18, 6 26 C6 32, 10 36, 16 36 C22 36, 26 32, 26 26 C26 18, 16 4, 16 4 Z" fill="#005BAC"/>
+    <path d="M16 12 C16 12, 10 22, 10 27 C10 31, 13 33, 16 33 C19 33, 22 31, 22 27 C22 22, 16 12, 16 12 Z" fill="#FFA500"/>
+  </g>
+  <text x="52" y="41" font-family="'Arial Black', sans-serif" font-size="24" font-weight="900" fill="#005BAC" letter-spacing="1">VENUS</text>
+</svg>
