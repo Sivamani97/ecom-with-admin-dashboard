@@ -15,7 +15,7 @@ import { SEO } from '../components/SEO';
 import { BackButton } from '../components/BackButton';
 import { BrandMarquee } from '../components/BrandMarquee';
 import { SITE_CONFIG } from '../config/siteConfig';
-import logoImg from '../images/logo/logo.jpeg';
+const logoImg = "/logo.png";
 
 export const AboutPage = ({ onOpenEnquiry }) => {
   return (

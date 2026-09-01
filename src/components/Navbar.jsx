@@ -3,7 +3,6 @@ import { NavLink, Link } from 'react-router-dom';
 import { PhoneCall, Sparkles } from 'lucide-react';
 import { SITE_CONFIG } from '../config/siteConfig';
 import { ThemeToggle } from './ThemeToggle';
-import logoImg from '../images/logo/logo.jpeg';
 
 export const Navbar = () => {
   return (
@@ -12,7 +11,7 @@ export const Navbar = () => {
         {/* Brand Logo & Since 1949 Badge */}
         <Link to="/" className="brand-logo-link" aria-label="Aruna Radios & Furniture Home">
           <div className="brand-logo-img-wrap">
-            <img src={logoImg} alt="Aruna Radios & Furniture" className="brand-logo-img" />
+            <img src="/logo.png" alt="Aruna Radios & Furniture" className="brand-logo-img" />
           </div>
           <div className="brand-info">
             <span className="brand-name">ARUNA</span>

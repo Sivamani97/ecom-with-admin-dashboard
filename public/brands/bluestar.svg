@@ -1,9 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 65" width="190" height="65">
-  <!-- 4-point star emblem -->
-  <g transform="translate(18, 12)">
-    <path d="M20 0 L24 14 L38 20 L24 26 L20 40 L16 26 L2 20 L16 14 Z" fill="#004B87"/>
-    <path d="M20 5 L23 16 L34 20 L23 24 L20 35 L17 24 L6 20 L17 16 Z" fill="#0072CE"/>
-  </g>
-  <text x="70" y="32" font-family="'Arial Black', sans-serif" font-size="18" font-weight="900" fill="#004B87" letter-spacing="1.2">BLUE</text>
-  <text x="70" y="50" font-family="'Arial Black', sans-serif" font-size="18" font-weight="900" fill="#004B87" letter-spacing="1.2">STAR</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <circle cx="30" cy="30" r="30" fill="#004B87"/>
+  <path d="M30 9 L33 19 L43 23 L33 27 L30 37 L27 27 L17 23 L27 19 Z" fill="#00A3E0"/>
+  <path d="M30 13 L32 20 L39 23 L32 26 L30 33 L28 26 L21 23 L28 20 Z" fill="#FFFFFF"/>
+  <text x="30" y="45" font-family="'Arial Black', sans-serif" font-size="6.5" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.5">BLUE STAR</text>
 </svg>

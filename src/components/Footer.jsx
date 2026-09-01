@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { MapPin, Phone, Clock, ShieldCheck, Heart } from 'lucide-react';
 import { InstagramIcon } from './SocialIcons';
 import { SITE_CONFIG } from '../config/siteConfig';
-import logoImg from '../images/logo/logo.jpeg';
 
 export const Footer = () => {
   return (
@@ -14,7 +13,7 @@ export const Footer = () => {
           <div>
             <div className="brand-logo-link" style={{ marginBottom: '0.85rem' }}>
               <div className="brand-logo-img-wrap">
-                <img src={logoImg} alt="Aruna Radios & Furniture" className="brand-logo-img" />
+                <img src="/logo.png" alt="Aruna Radios & Furniture" className="brand-logo-img" />
               </div>
               <div className="brand-info">
                 <span className="brand-name">ARUNA</span>

@@ -25,7 +25,7 @@ import { BrandMarquee } from '../components/BrandMarquee';
 import { SITE_CONFIG } from '../config/siteConfig';
 import { REVIEWS } from '../data/reviews';
 import { PRODUCT_CATEGORIES } from '../data/products';
-import logoImg from '../images/logo/logo.jpeg';
+const logoImg = "/logo.png";
 
 export const HomePage = ({ onOpenEnquiry }) => {
   const navigate = useNavigate();

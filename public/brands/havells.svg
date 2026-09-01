@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 65" width="180" height="65">
-  <!-- Havells red square badge + text -->
-  <rect x="15" y="16" width="32" height="32" rx="4" fill="#D0021B"/>
-  <text x="31" y="41" font-family="'Arial Black', sans-serif" font-size="24" font-weight="900" fill="#FFFFFF" text-anchor="middle">H</text>
-  <text x="56" y="40" font-family="'Arial Black', 'Helvetica Black', sans-serif" font-size="22" font-weight="900" fill="#D0021B" letter-spacing="1">HAVELLS</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <circle cx="30" cy="30" r="30" fill="#D0021B"/>
+  <rect x="20" y="16" width="20" height="20" rx="3" fill="#FFFFFF"/>
+  <text x="30" y="32" font-family="'Arial Black', sans-serif" font-size="15" font-weight="900" fill="#D0021B" text-anchor="middle">H</text>
+  <text x="30" y="46" font-family="'Arial Black', sans-serif" font-size="6" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.5">HAVELLS</text>
 </svg>

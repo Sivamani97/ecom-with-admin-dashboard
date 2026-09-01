@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { SITE_CONFIG } from '../config/siteConfig';
-import logoImg from '../images/logo/logo.jpeg';
 
 export const SplashScreen = ({ onFinish }) => {
   const [visible, setVisible] = useState(false);
@@ -41,7 +40,7 @@ export const SplashScreen = ({ onFinish }) => {
       <div className="splash-content">
         {/* Brand Logo with Golden Aura */}
         <div className="splash-logo-wrap">
-          <img src={logoImg} alt="Aruna Radios & Furniture Logo" className="splash-logo-img" />
+          <img src="/logo.png" alt="Aruna Radios & Furniture Logo" className="splash-logo-img" />
         </div>
 
         <h1 className="splash-title">ARUNA RADIOS &amp; FURNITURE</h1>

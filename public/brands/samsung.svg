@@ -1,8 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 65" width="180" height="65">
-  <!-- Samsung signature blue oval -->
-  <ellipse cx="90" cy="32.5" rx="84" ry="24" fill="#034EA2" transform="rotate(-6 90 32.5)"/>
-  <!-- Samsung custom lettering -->
-  <g fill="#FFFFFF">
-    <text x="90" y="40" font-family="'Arial Black', 'Helvetica Black', sans-serif" font-size="22" font-weight="900" text-anchor="middle" letter-spacing="1.5">SAMSUNG</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <circle cx="30" cy="30" r="30" fill="#034EA2"/>
+  <g fill="#FFFFFF" text-anchor="middle">
+    <text x="30" y="34" font-family="'Arial Black', sans-serif" font-size="9" font-weight="900" letter-spacing="0.5">SAMSUNG</text>
   </g>
 </svg>
