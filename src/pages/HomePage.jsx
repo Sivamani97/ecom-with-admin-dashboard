@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -14,8 +14,10 @@ import {
   CheckCircle2, 
   ShoppingBag, 
   Flame,
+  Gift,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  LayoutGrid
 } from 'lucide-react';
 import { InstagramIcon } from '../components/SocialIcons';
 import { SEO } from '../components/SEO';
@@ -23,23 +25,77 @@ import { BrandMarquee } from '../components/BrandMarquee';
 import { SITE_CONFIG } from '../config/siteConfig';
 import { REVIEWS } from '../data/reviews';
 import { PRODUCT_CATEGORIES } from '../data/products';
+import logoImg from '../images/logo/logo.jpeg';
 
 export const HomePage = ({ onOpenEnquiry }) => {
+  const navigate = useNavigate();
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [selectedHeroCategory, setSelectedHeroCategory] = useState('all');
 
   const displayedReviews = showAllReviews ? REVIEWS : REVIEWS.slice(0, 3);
 
-  const categoryIcons = {
-    furniture: <Armchair size={28} color="var(--primary)" />,
-    'kitchen-appliances': <ChefHat size={28} color="var(--primary)" />,
-    'home-appliances': <Tv size={28} color="var(--primary)" />
+  const heroCategoryOptions = [
+    { id: 'all', name: 'All Products', label: 'All Products', count: '34 Items', icon: <LayoutGrid size={18} /> },
+    { id: 'furniture', name: 'Furniture', label: 'Furnitures & Cots', count: '13 Items', icon: <Armchair size={18} /> },
+    { id: 'home-appliances', name: 'Home Appliances', label: 'Home Appliances', count: '10 Items', icon: <Tv size={18} /> },
+    { id: 'kitchen-appliances', name: 'Kitchen Appliances', label: 'Kitchen Appliances', count: '11 Items', icon: <ChefHat size={18} /> }
+  ];
+
+  const handleHeroCategorySubmit = (e) => {
+    e?.preventDefault();
+    if (selectedHeroCategory === 'all') {
+      navigate('/products');
+    } else {
+      navigate(`/products?category=${selectedHeroCategory}`);
+    }
   };
 
-  const categoryImages = {
-    furniture: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&auto=format&fit=crop&q=80",
-    'kitchen-appliances': "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&auto=format&fit=crop&q=80",
-    'home-appliances': "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=600&auto=format&fit=crop&q=80"
+  const handleDirectCategoryClick = (catId) => {
+    setSelectedHeroCategory(catId);
+    if (catId === 'all') {
+      navigate('/products');
+    } else {
+      navigate(`/products?category=${catId}`);
+    }
   };
+
+  const currentCategoryObj = heroCategoryOptions.find(c => c.id === selectedHeroCategory) || heroCategoryOptions[0];
+
+  // 4 Featured Categories for the 2x2 mobile grid and 4-column desktop grid
+  const featuredCategories = [
+    {
+      id: "furniture",
+      name: "Furniture & Cots",
+      desc: "Teakwood cots, luxury sofas & steel beros",
+      link: "/products?category=furniture",
+      badge: "13 Items",
+      image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "kitchen-appliances",
+      name: "Kitchen Appliances",
+      desc: "Heavy mixies, wet grinders & gas stoves",
+      link: "/products?category=kitchen-appliances",
+      badge: "11 Items",
+      image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "home-appliances",
+      name: "Home Electronics",
+      desc: "BLDC fans, geysers & inverter combos",
+      link: "/products?category=home-appliances",
+      badge: "10 Items",
+      image: "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "offers",
+      name: "Festival Deals",
+      desc: "Combo packages & zero-cost EMI offers",
+      link: "/offers",
+      badge: "Mega Sale",
+      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&auto=format&fit=crop&q=80"
+    }
+  ];
 
   return (
     <>
@@ -52,50 +108,99 @@ export const HomePage = ({ onOpenEnquiry }) => {
       <section className="hero-section">
         <div className="container">
           <div className="hero-grid">
-            <div>
-              <div className="hero-badge">
-                <ShieldCheck size={16} />
-                <span>Trusted in Jayankondam Since 1949</span>
+            <div className="hero-content-col">
+              <div className="hero-badge-row">
+                <div className="hero-badge">
+                  <ShieldCheck size={16} />
+                  <span>Jayankondam's Trusted Showroom</span>
+                </div>
+                <div className="hero-heritage-tag">
+                  <Sparkles size={14} className="sparkle-anim" />
+                  <span>ESTD. 1949</span>
+                </div>
               </div>
 
               <h1 className="hero-title">
-                {SITE_CONFIG.tagline.split('.')[0]}.<br />
-                <span className="hero-title-gradient">{SITE_CONFIG.tagline.split('.')[1]}.</span><br />
-                {SITE_CONFIG.tagline.split('.')[2]}
+                <span className="hero-title-row">Quality Products.</span>
+                <span className="hero-title-gradient">Best Prices.</span>
+                <span className="hero-title-row hero-trusted-row">
+                  Trusted Since <span className="hero-year-highlight" title="Serving since 1949">1949</span>
+                </span>
               </h1>
 
-              <p className="hero-subtagline">
-                {SITE_CONFIG.subTagline}
-              </p>
+              <div className="hero-subtagline-wrapper">
+                <p className="hero-subtagline">
+                  <span className="hero-subtagline-spark">✨</span>
+                  {SITE_CONFIG.subTagline}
+                </p>
+              </div>
 
+              {/* Premium Category Finder / Dropdown Hub */}
+              <div className="hero-category-hub">
+                <div className="hero-hub-header">
+                  <div className="hero-hub-title-wrap">
+                    <span className="hero-hub-dot"></span>
+                    <span className="hero-hub-title">Select Product Category</span>
+                  </div>
+                  <span className="hero-hub-count">34 Showroom Items</span>
+                </div>
+
+                <form onSubmit={handleHeroCategorySubmit} className="hero-finder-bar">
+                  <div className="hero-dropdown-wrapper">
+                    <div className="hero-dropdown-icon">
+                      {currentCategoryObj.icon}
+                    </div>
+                    <select
+                      id="hero-category-dropdown"
+                      className="hero-category-select"
+                      value={selectedHeroCategory}
+                      onChange={(e) => setSelectedHeroCategory(e.target.value)}
+                      aria-label="Select product category"
+                    >
+                      <option value="all">All Products (Full Showroom)</option>
+                      <option value="furniture">Furnitures &amp; Cots (13 Items)</option>
+                      <option value="home-appliances">Home Appliances (10 Items)</option>
+                      <option value="kitchen-appliances">Kitchen Appliances (11 Items)</option>
+                    </select>
+                    <ChevronDown size={16} className="hero-select-arrow" />
+                  </div>
+
+                  <button type="submit" className="hero-finder-btn" id="hero-explore-btn">
+                    <span>Explore</span>
+                    <ArrowRight size={17} />
+                  </button>
+                </form>
+              </div>
+
+              {/* Action Buttons */}
               <div className="hero-cta-group">
-                <Link to="/products" className="btn btn-primary btn-lg">
-                  <ShoppingBag size={20} />
-                  <span>Explore All Products</span>
-                  <ArrowRight size={18} />
-                </Link>
-
                 <button
                   onClick={() => onOpenEnquiry && onOpenEnquiry('General Product Enquiry')}
                   className="btn btn-whatsapp btn-lg"
                 >
-                  <span>Quick WhatsApp Enquiry</span>
+                  <PhoneCall size={18} />
+                  <span>WhatsApp Enquiry</span>
                 </button>
+
+                <Link to="/offers" className="btn btn-gold btn-lg">
+                  <Gift size={18} />
+                  <span>View Festival Deals</span>
+                </Link>
               </div>
 
               {/* Trust Stats Strip */}
               <div className="hero-stats-strip">
                 <div className="stat-item">
                   <span className="stat-value">{SITE_CONFIG.yearsOfTrust}</span>
-                  <span className="stat-label">Years of Unbroken Trust</span>
+                  <span className="stat-label">Years of Trust</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-value">10,000+</span>
-                  <span className="stat-label">Happy Families Served</span>
+                  <span className="stat-label">Happy Families</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-value">25+</span>
-                  <span className="stat-label">Leading National Brands</span>
+                  <span className="stat-label">Top Brands</span>
                 </div>
               </div>
             </div>
@@ -111,22 +216,21 @@ export const HomePage = ({ onOpenEnquiry }) => {
               </div>
 
               <div className="hero-floating-pill">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                   <div style={{
                     width: '38px',
                     height: '38px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--accent-gold-light)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--accent-gold-dark)'
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #d97706',
+                    flexShrink: 0
                   }}>
-                    <Flame size={20} />
+                    <img src={logoImg} alt="Aruna Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </div>
                   <div>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: 700 }}>Jayankondam's No. 1 Choice</h4>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Cots, Beros, Mixies, TVs &amp; Inverters</p>
+                    <h4 style={{ fontSize: '0.88rem', fontWeight: 800 }}>Jayankondam's Pride</h4>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Cots, Beros, Mixies &amp; Inverters</p>
                   </div>
                 </div>
 
@@ -139,47 +243,46 @@ export const HomePage = ({ onOpenEnquiry }) => {
         </div>
       </section>
 
-      {/* Rotating Brand Logo Marquee */}
+      {/* Rounded Brand Logo Carousel */}
       <BrandMarquee />
 
-      {/* Category Preview Showcase */}
+      {/* 4 Category Showcase (2-in-a-row on mobile, 4-in-a-row on desktop) */}
       <section className="section-padding" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header">
-            <span className="section-badge">Product Categories</span>
-            <h2 className="section-title">Everything for Your Dream Home</h2>
+            <span className="section-badge">Explore Categories</span>
+            <h2 className="section-title">Everything for Your Home</h2>
             <p className="section-desc">
-              Browse our wide selection of certified home appliances, heavy-duty electronics, and durable furniture crafted for longevity.
+              Browse our certified home appliances, heavy-duty electronics, and durable furniture built for longevity.
             </p>
           </div>
 
-          <div className="category-grid">
-            {PRODUCT_CATEGORIES.filter(c => c.id !== 'all').map((cat) => (
+          <div className="category-grid-4">
+            {featuredCategories.map((cat) => (
               <Link
                 key={cat.id}
-                to={`/products?category=${cat.id}`}
+                to={cat.link}
                 className="category-card"
               >
                 <div className="category-img-wrap">
                   <img
-                    src={categoryImages[cat.id]}
+                    src={cat.image}
                     alt={`${cat.name} Collection`}
                     loading="lazy"
                   />
                   <div className="category-badge-chip">
-                    {cat.count} Items
+                    {cat.badge}
                   </div>
                 </div>
 
                 <div className="category-content">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-                    {categoryIcons[cat.id]}
-                    <h3 className="category-card-title" style={{ marginBottom: 0 }}>{cat.name}</h3>
+                  <div>
+                    <h3 className="category-card-title">{cat.name}</h3>
+                    <p className="category-card-desc">{cat.desc}</p>
                   </div>
-                  <p className="category-card-desc">{cat.desc}</p>
                   <span className="category-link-btn">
-                    <span>Browse {cat.name}</span>
-                    <ArrowRight size={16} />
+                    <span>Browse</span>
+                    <ArrowRight size={14} />
                   </span>
                 </div>
               </Link>
@@ -194,56 +297,60 @@ export const HomePage = ({ onOpenEnquiry }) => {
           <div style={{
             background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 100%)',
             borderRadius: 'var(--radius-xl)',
-            padding: '2.5rem',
+            padding: '2.25rem',
             border: '1px solid var(--border-color)',
             boxShadow: 'var(--shadow-md)'
           }}>
             <div className="section-badge">Our Legacy Since 1949</div>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--text-primary)' }}>
+            <h2 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '0.85rem', color: 'var(--text-primary)' }}>
               Serving Jayankondam with Trust for Over 7 Decades
             </h2>
-            <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: '1.75rem', maxWidth: '880px' }}>
+            <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: '1.5rem', maxWidth: '880px' }}>
               Serving Jayankondam with trust since 1949, <strong>Aruna Radios &amp; Furniture</strong> is a trusted destination for quality home appliances, electronics, and furniture. From modern home appliances and the latest electronics to stylish and comfortable furniture, we offer everything you need to make your home smarter, more comfortable, and more beautiful.
             </p>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
               <Link to="/about" className="btn btn-primary">
-                <span>Read Our Full Story</span>
+                <span>Read Full History</span>
                 <ArrowRight size={16} />
               </Link>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-gold-dark)', fontWeight: 700, fontSize: '0.9rem' }}>
-                <CheckCircle2 size={18} />
-                <span>100% Genuine Warranty &amp; Local Service Support</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-gold-dark)', fontWeight: 800, fontSize: '0.88rem' }}>
+                <CheckCircle2 size={17} />
+                <span>100% Brand Warranty &amp; Doorstep Delivery</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Customer Reviews Section (3 default + View More toggle) */}
+      {/* Customer Reviews Section with Avatar Image Slots & Even Layout */}
       <section className="section-padding" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header">
             <span className="section-badge">Customer Testimonials</span>
             <h2 className="section-title">What Our Customers in Jayankondam Say</h2>
             <p className="section-desc">
-              Real reviews from generations of families who rely on Aruna Radios &amp; Furniture for their homes.
+              Real feedback from generations of families who rely on Aruna Radios &amp; Furniture.
             </p>
           </div>
 
           <div className="reviews-grid">
             {displayedReviews.map((rev) => (
               <div key={rev.id} className="review-card">
-                <div className="review-stars">
-                  {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} size={18} fill="#f59e0b" color="#f59e0b" />
-                  ))}
+                <div>
+                  <div className="review-stars">
+                    {[...Array(rev.rating)].map((_, i) => (
+                      <Star key={i} size={16} fill="#f59e0b" color="#f59e0b" />
+                    ))}
+                  </div>
+                  <h3 className="review-title">"{rev.title}"</h3>
+                  <p className="review-comment">"{rev.comment}"</p>
                 </div>
-                <h3 className="review-title">"{rev.title}"</h3>
-                <p className="review-comment">"{rev.comment}"</p>
+
                 <div className="reviewer-meta">
-                  <div className="reviewer-avatar">
+                  <div className="reviewer-avatar-slot">
+                    {/* Render photo or stylish initials fallback */}
                     {rev.name.charAt(0)}
                   </div>
                   <div className="reviewer-info">
@@ -262,7 +369,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
               className="btn btn-secondary"
             >
               <span>{showAllReviews ? 'Show Fewer Reviews' : `View More Reviews (${REVIEWS.length - 3} more)`}</span>
-              {showAllReviews ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              {showAllReviews ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
           </div>
         </div>
@@ -275,7 +382,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
             <span className="section-badge">Visit Our Showroom</span>
             <h2 className="section-title">Conveniently Located in Jayankondam</h2>
             <p className="section-desc">
-              Step into our spacious store to experience furniture comfort and test live appliances before you buy.
+              Step into our store to experience furniture comfort and test live appliances before you buy.
             </p>
           </div>
 
@@ -284,7 +391,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
             <div className="contact-info-card">
               <div className="info-row">
                 <div className="info-icon-box">
-                  <MapPin size={22} />
+                  <MapPin size={20} />
                 </div>
                 <div className="info-content">
                   <span className="info-label">Store Address</span>
@@ -293,7 +400,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
                     {SITE_CONFIG.contact.address.line2}<br />
                     {SITE_CONFIG.contact.address.city}, {SITE_CONFIG.contact.address.state} - {SITE_CONFIG.contact.address.pincode}
                   </span>
-                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
                     ({SITE_CONFIG.contact.address.landmark})
                   </span>
                 </div>
@@ -301,14 +408,14 @@ export const HomePage = ({ onOpenEnquiry }) => {
 
               <div className="info-row">
                 <div className="info-icon-box">
-                  <PhoneCall size={22} />
+                  <PhoneCall size={20} />
                 </div>
                 <div className="info-content">
-                  <span className="info-label">Direct Phone &amp; Support</span>
+                  <span className="info-label">Direct Phone</span>
                   <a href={`tel:${SITE_CONFIG.contact.phone.replace(/\s+/g, '')}`} className="info-value">
                     {SITE_CONFIG.contact.phone}
                   </a>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                     Alt: {SITE_CONFIG.contact.altPhone}
                   </span>
                 </div>
@@ -316,18 +423,18 @@ export const HomePage = ({ onOpenEnquiry }) => {
 
               <div className="info-row">
                 <div className="info-icon-box">
-                  <Clock size={22} />
+                  <Clock size={20} />
                 </div>
                 <div className="info-content">
-                  <span className="info-label">Showroom Working Hours</span>
+                  <span className="info-label">Showroom Hours</span>
                   <span className="info-value">{SITE_CONFIG.contact.hours.weekday}</span>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                     {SITE_CONFIG.contact.hours.sunday}
                   </span>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.65rem', marginTop: '0.35rem' }}>
                 <a
                   href={SITE_CONFIG.contact.googleMapsDirectionsUrl}
                   target="_blank"
@@ -335,7 +442,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
                   className="btn btn-primary"
                   style={{ flex: 1 }}
                 >
-                  <MapPin size={18} />
+                  <MapPin size={16} />
                   <span>Get Directions</span>
                 </a>
 
@@ -346,14 +453,14 @@ export const HomePage = ({ onOpenEnquiry }) => {
                   className="btn btn-secondary"
                   aria-label="Instagram Profile"
                 >
-                  <InstagramIcon size={18} color="#E1306C" />
+                  <InstagramIcon size={17} color="#E1306C" />
                   <span>Instagram</span>
                 </a>
               </div>
             </div>
 
             {/* Google Map Embed */}
-            <div className="map-container" style={{ height: '360px' }}>
+            <div className="map-container" style={{ height: '340px' }}>
               <iframe
                 title="Aruna Radios & Furniture Location Map Jayankondam"
                 src={SITE_CONFIG.contact.googleMapsEmbedUrl}

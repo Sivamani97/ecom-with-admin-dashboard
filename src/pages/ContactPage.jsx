@@ -22,13 +22,19 @@ export const ContactPage = () => {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.phone || !formData.name) {
-      alert('Please fill out your name and phone number.');
+    if (!formData.name.trim()) {
+      setFormError('Please enter your full name.');
       return;
     }
+    if (!formData.phone.trim()) {
+      setFormError('Please enter your phone number.');
+      return;
+    }
+    setFormError('');
 
     const businessNumber = SITE_CONFIG.contact.whatsapp;
     const textMsg = 
@@ -197,14 +203,31 @@ _Sent from Website Contact Page_`;
                     We've opened your enquiry directly on WhatsApp for instant confirmation.
                   </p>
                   <button
-                    onClick={() => setSubmitted(false)}
+                    onClick={() => { setSubmitted(false); setFormError(''); setFormData({ name: '', phone: '', product: '', message: '' }); }}
                     className="btn btn-secondary btn-sm"
                   >
                     Send Another Message
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
+                  {formError && (
+                    <div role="alert" style={{
+                      padding: '0.7rem 1rem',
+                      marginBottom: '1rem',
+                      backgroundColor: '#fef2f2',
+                      border: '1px solid #fca5a5',
+                      borderRadius: 'var(--radius-md)',
+                      color: '#dc2626',
+                      fontSize: '0.88rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem'
+                    }}>
+                      ⚠️ {formError}
+                    </div>
+                  )}
                   <div className="form-group">
                     <label className="form-label" htmlFor="contact-name">
                       Full Name <span style={{ color: '#dc2626' }}>*</span>
@@ -215,7 +238,7 @@ _Sent from Website Contact Page_`;
                       className="form-control"
                       placeholder="e.g. Ramesh Kumar"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) => { setFormData({ ...formData, name: e.target.value }); if (formError) setFormError(''); }}
                       required
                     />
                   </div>
@@ -230,7 +253,7 @@ _Sent from Website Contact Page_`;
                       className="form-control"
                       placeholder="e.g. 94432 54321"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); if (formError) setFormError(''); }}
                       required
                     />
                   </div>

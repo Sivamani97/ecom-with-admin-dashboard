@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, Phone, Package, FileText, CheckCircle2 } from 'lucide-react';
 import { SITE_CONFIG } from '../config/siteConfig';
 
@@ -8,20 +8,47 @@ export const WhatsAppModal = ({ isOpen, onClose, initialProduct = '', defaultOpe
   const [product, setProduct] = useState(initialProduct);
   const [description, setDescription] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const prevInitialProduct = useRef(initialProduct);
 
   // Sync external isOpen prop with internal state if provided
   useEffect(() => {
     if (isOpen !== undefined) {
       setModalOpen(isOpen);
+      // Reset form when opened externally
+      if (isOpen) setSubmitted(false);
     }
   }, [isOpen]);
 
+  // Only open modal and update product when initialProduct *changes* (not on first render if empty)
   useEffect(() => {
-    if (initialProduct) {
+    if (initialProduct && initialProduct !== prevInitialProduct.current) {
       setProduct(initialProduct);
       setModalOpen(true);
+      setSubmitted(false);
     }
+    prevInitialProduct.current = initialProduct;
   }, [initialProduct]);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    if (!modalOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [modalOpen]);
+
+  // Scroll lock when modal is open
+  useEffect(() => {
+    if (modalOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => document.body.classList.remove('modal-open');
+  }, [modalOpen]);
 
   const handleClose = () => {
     setModalOpen(false);
@@ -32,9 +59,10 @@ export const WhatsAppModal = ({ isOpen, onClose, initialProduct = '', defaultOpe
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!phoneNumber.trim()) {
-      alert('Please enter your contact phone number.');
+      setPhoneError('Please enter your phone number.');
       return;
     }
+    setPhoneError('');
 
     const businessNumber = SITE_CONFIG.contact.whatsapp;
     
@@ -140,10 +168,16 @@ _Sent via arunaradiosandfurniture.com_`;
                       className="form-control"
                       placeholder="e.g. 98424 12345"
                       value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      onChange={(e) => { setPhoneNumber(e.target.value); if (phoneError) setPhoneError(''); }}
                       required
                       autoFocus
+                      aria-describedby={phoneError ? 'wa-phone-error' : undefined}
                     />
+                    {phoneError && (
+                      <p id="wa-phone-error" role="alert" style={{ color: '#dc2626', fontSize: '0.82rem', fontWeight: 700, marginTop: '0.35rem' }}>
+                        ⚠️ {phoneError}
+                      </p>
+                    )}
                   </div>
 
                   <div className="form-group">

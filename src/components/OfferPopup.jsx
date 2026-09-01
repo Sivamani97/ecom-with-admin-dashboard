@@ -24,6 +24,23 @@ export const OfferPopup = ({ onClaimOffer }) => {
     }
   }, []);
 
+  // Escape key + body scroll lock
+  useEffect(() => {
+    if (!isOpen) {
+      document.body.classList.remove('modal-open');
+      return;
+    }
+    document.body.classList.add('modal-open');
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
+
   if (!SHOW_OFFER_POPUP || !isOpen) return null;
 
   const handleClose = () => {

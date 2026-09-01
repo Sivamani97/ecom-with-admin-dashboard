@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Search, 
@@ -8,7 +8,8 @@ import {
   Check, 
   SlidersHorizontal,
   X,
-  Info
+  Info,
+  ChevronDown
 } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import { BackButton } from '../components/BackButton';
@@ -21,6 +22,23 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductDetail, setSelectedProductDetail] = useState(null);
+
+  // Close modal on Escape key + body scroll lock
+  useEffect(() => {
+    if (!selectedProductDetail) {
+      document.body.classList.remove('modal-open');
+      return;
+    }
+    document.body.classList.add('modal-open');
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedProductDetail(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.classList.remove('modal-open');
+    };
+  }, [selectedProductDetail]);
 
   // Sync category state with URL parameters
   useEffect(() => {
@@ -101,18 +119,20 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
               )}
             </div>
 
-            <div className="category-tabs" role="tablist">
-              {PRODUCT_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryChange(cat.id)}
-                  className={`tab-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                  role="tab"
-                  aria-selected={activeCategory === cat.id}
-                >
-                  {cat.name} {cat.id !== 'all' ? `(${cat.count})` : ''}
-                </button>
-              ))}
+            <div className="hero-dropdown-wrapper" style={{ marginTop: '1rem', width: '100%', maxWidth: '100%' }}>
+              <select
+                className="hero-category-select"
+                value={activeCategory}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                aria-label="Filter products by category"
+              >
+                {PRODUCT_CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name} {cat.id !== 'all' ? `(${cat.count})` : ''}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={16} className="hero-select-arrow" />
             </div>
           </div>
 
