@@ -2,9 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Clock, ShieldCheck, Heart } from 'lucide-react';
 import { InstagramIcon } from './SocialIcons';
-import { SITE_CONFIG } from '../config/siteConfig';
+import { useBusinessSettings } from '../context/BusinessSettingsContext';
 
 export const Footer = () => {
+  const { settings } = useBusinessSettings();
   return (
     <footer className="site-footer">
       <div className="container">
@@ -22,12 +23,12 @@ export const Footer = () => {
             </div>
 
             <p className="footer-tagline-text">
-              {SITE_CONFIG.subTagline} Serving Jayankondam and surrounding regions with authentic products, competitive prices, and trusted service since 1949.
+              Quality Products. Best Prices. Serving Jayankondam and surrounding regions with authentic products, competitive prices, and trusted service since 1949.
             </p>
 
             <div style={{ display: 'flex', gap: '0.65rem', marginTop: '1rem' }}>
               <a
-                href={SITE_CONFIG.contact.instagramUrl}
+                href={settings.instagram_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary btn-sm"
@@ -39,7 +40,7 @@ export const Footer = () => {
               </a>
 
               <a
-                href={SITE_CONFIG.contact.googleMapsDirectionsUrl}
+                href={settings.google_maps_directions_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary btn-sm"
@@ -84,20 +85,20 @@ export const Footer = () => {
               <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                 <MapPin size={16} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>
-                  {SITE_CONFIG.contact.address.line1}, {SITE_CONFIG.contact.address.line2}, {SITE_CONFIG.contact.address.city} - {SITE_CONFIG.contact.address.pincode}
+                  {settings.address_line1}, {settings.address_line2}, {settings.city} - {settings.pincode}
                 </span>
               </li>
               <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                 <Phone size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
-                <a href={`tel:${SITE_CONFIG.contact.phone.replace(/\s+/g, '')}`} style={{ fontWeight: 700 }}>
-                  {SITE_CONFIG.contact.phone}
+                <a href={`tel:${(settings.phone_primary || '').replace(/\s+/g, '')}`} style={{ fontWeight: 700 }}>
+                  {settings.phone_primary}
                 </a>
               </li>
               <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                 <Clock size={16} color="var(--accent-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div>
-                  <p>{SITE_CONFIG.contact.hours.weekday}</p>
-                  <p>{SITE_CONFIG.contact.hours.sunday}</p>
+                  <p>{settings.hours_weekday}</p>
+                  <p>{settings.hours_sunday}</p>
                 </div>
               </li>
             </ul>
@@ -107,7 +108,7 @@ export const Footer = () => {
         {/* Footer Bottom Verbatim Line */}
         <div className="footer-bottom">
           <p className="footer-bottom-line">
-            {SITE_CONFIG.footerLine}
+            Since 1949 | Quality • Trust • Value • Customer Satisfaction — Bringing Quality and Comfort to Every Home.
           </p>
           <p className="footer-copyright">
             © {new Date().getFullYear()} Aruna Radios &amp; Furniture – Jayankondam. All rights reserved.

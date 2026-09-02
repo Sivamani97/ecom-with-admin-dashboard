@@ -2,9 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, RefreshCw, PhoneCall, ShoppingBag } from 'lucide-react';
 import { SEO } from '../components/SEO';
-import { SITE_CONFIG } from '../config/siteConfig';
+import { useBusinessSettings } from '../context/BusinessSettingsContext';
 
 export const ErrorPage = () => {
+  const { settings } = useBusinessSettings();
   return (
     <>
       <SEO
@@ -53,7 +54,7 @@ export const ErrorPage = () => {
             </Link>
 
             <a
-              href={`tel:${SITE_CONFIG.contact.phone.replace(/\s+/g, '')}`}
+              href={`tel:${(settings.phone_primary || '+919597589230').replace(/\s+/g, '')}`}
               className="btn btn-outline btn-lg"
             >
               <PhoneCall size={18} />

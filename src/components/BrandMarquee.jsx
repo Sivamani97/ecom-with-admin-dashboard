@@ -47,7 +47,6 @@ export const BrandMarquee = () => {
             </div>
           </div>
           <span className="brand-rounded-name">{brand.name}</span>
-          <span className="brand-rounded-tag">{brand.tag.split('&')[0]}</span>
         </div>
       );
     });

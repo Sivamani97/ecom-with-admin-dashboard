@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, Phone, Package, FileText, CheckCircle2 } from 'lucide-react';
-import { SITE_CONFIG } from '../config/siteConfig';
+import { useBusinessSettings } from '../context/BusinessSettingsContext';
 
 export const WhatsAppModal = ({ isOpen, onClose, initialProduct = '', defaultOpen = false }) => {
+  const { settings } = useBusinessSettings();
   const [modalOpen, setModalOpen] = useState(defaultOpen);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [product, setProduct] = useState(initialProduct);
@@ -64,7 +65,7 @@ export const WhatsAppModal = ({ isOpen, onClose, initialProduct = '', defaultOpe
     }
     setPhoneError('');
 
-    const businessNumber = SITE_CONFIG.contact.whatsapp;
+    const businessNumber = settings.whatsapp_number || '919597589230';
     
     // Construct structured WhatsApp message
     const message = 

@@ -13,15 +13,33 @@ import {
 } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import { BackButton } from '../components/BackButton';
-import { PRODUCTS, PRODUCT_CATEGORIES } from '../data/products';
+import { api } from '../lib/api';
 
 export const ProductsPage = ({ onOpenEnquiry }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
 
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductDetail, setSelectedProductDetail] = useState(null);
+
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch dynamic data from Supabase
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const [fetchedProducts, fetchedCategories] = await Promise.all([
+        api.getProducts(),
+        api.getCategories()
+      ]);
+      setProducts(fetchedProducts);
+      setCategories(fetchedCategories);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
 
   // Close modal on Escape key + body scroll lock
   useEffect(() => {
@@ -43,9 +61,9 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
   // Sync category state with URL parameters
   useEffect(() => {
     const cat = searchParams.get('category');
-    if (cat && ['furniture', 'kitchen-appliances', 'home-appliances'].includes(cat)) {
+    if (cat) {
       setActiveCategory(cat);
-    } else if (!cat) {
+    } else {
       setActiveCategory('all');
     }
   }, [searchParams]);
@@ -60,22 +78,13 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
     }
   };
 
-  // Filter products based on active category & search query
+  // Filter products based on active category
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((item) => {
-      const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
-      const q = searchQuery.toLowerCase().trim();
-      const matchesQuery = 
-        !q ||
-        item.name.toLowerCase().includes(q) ||
-        item.itemType.toLowerCase().includes(q) ||
-        item.categoryLabel.toLowerCase().includes(q) ||
-        item.highlight.toLowerCase().includes(q) ||
-        item.popularBrands.some(b => b.toLowerCase().includes(q));
-
-      return matchesCategory && matchesQuery;
+    return products.filter((item) => {
+      const matchesCategory = activeCategory === 'all' || item.categories?.slug === activeCategory || item.category_id === activeCategory;
+      return matchesCategory;
     });
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, products]);
 
   return (
     <>
@@ -96,39 +105,19 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             </p>
           </div>
 
-          {/* Search Bar & Category Tabs */}
-          <div className="catalog-search-bar">
-            <div className="search-input-wrap">
-              <Search size={20} />
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search mixie, sofa, cot, bero, fan, cooker, water heater..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search products"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}
-                  aria-label="Clear search"
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-
-            <div className="hero-dropdown-wrapper" style={{ marginTop: '1rem', width: '100%', maxWidth: '100%' }}>
+          {/* Category Tabs */}
+          <div className="catalog-search-bar" style={{ justifyContent: 'flex-start' }}>
+            <div className="hero-dropdown-wrapper" style={{ width: '100%', maxWidth: '300px' }}>
               <select
                 className="hero-category-select"
                 value={activeCategory}
                 onChange={(e) => handleCategoryChange(e.target.value)}
                 aria-label="Filter products by category"
               >
-                {PRODUCT_CATEGORIES.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name} {cat.id !== 'all' ? `(${cat.count})` : ''}
+                <option value="all">All Products</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.slug || cat.id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
@@ -139,14 +128,13 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
           {/* Active Filter Status */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-              Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
-              {activeCategory !== 'all' && ` in ${PRODUCT_CATEGORIES.find(c => c.id === activeCategory)?.name}`}
-              {searchQuery && ` matching "${searchQuery}"`}
+              Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'Model' : 'Models'}
+              {activeCategory !== 'all' && ` in ${categories.find(c => c.slug === activeCategory || c.id === activeCategory)?.name || 'Selected Category'}`}
             </span>
 
-            {(activeCategory !== 'all' || searchQuery) && (
+            {activeCategory !== 'all' && (
               <button
-                onClick={() => { setActiveCategory('all'); setSearchQuery(''); setSearchParams({}); }}
+                onClick={() => { setActiveCategory('all'); setSearchParams({}); }}
                 className="btn btn-outline btn-sm"
               >
                 Reset Filters
@@ -155,23 +143,32 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
           </div>
 
           {/* Products Grid */}
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '4rem' }}>
+              <div className="sparkle-anim" style={{ fontSize: '2rem' }}>✨</div>
+              <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>Loading catalog...</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="products-grid">
               {filteredProducts.map((product) => (
                 <div key={product.id} className="product-card">
                   {/* Image Frame */}
                   <div className="product-img-wrap">
                     <img
-                      src={product.image}
+                      src={product.image_url}
                       alt={product.name}
                       loading="lazy"
                     />
-                    <span className="product-tag-badge">
-                      {product.tag}
-                    </span>
-                    <span className="product-category-chip">
-                      {product.categoryLabel}
-                    </span>
+                    {product.tag && (
+                      <span className="product-tag-badge">
+                        {product.tag}
+                      </span>
+                    )}
+                    {product.categories?.name && (
+                      <span className="product-category-chip">
+                        {product.categories.name}
+                      </span>
+                    )}
                   </div>
 
                   {/* Details */}
@@ -257,7 +254,7 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             <div className="modal-header">
               <div>
                 <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase' }}>
-                  {selectedProductDetail.categoryLabel}
+                  {selectedProductDetail.categories?.name}
                 </span>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>
                   {selectedProductDetail.name}
@@ -275,7 +272,7 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             <div className="modal-body">
               <div style={{ height: '220px', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '1.25rem' }}>
                 <img
-                  src={selectedProductDetail.image}
+                  src={selectedProductDetail.image_url}
                   alt={selectedProductDetail.name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />

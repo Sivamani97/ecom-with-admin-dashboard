@@ -1062,8 +1062,8 @@ textarea.form-control {
 }
 
 @keyframes marqueeSlide {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(0); }
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
 /* Rounded Circular Brand Logo Badges */

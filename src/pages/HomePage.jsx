@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
@@ -22,24 +22,43 @@ import {
 import { InstagramIcon } from '../components/SocialIcons';
 import { SEO } from '../components/SEO';
 import { BrandMarquee } from '../components/BrandMarquee';
-import { SITE_CONFIG } from '../config/siteConfig';
-import { REVIEWS } from '../data/reviews';
-import { PRODUCT_CATEGORIES } from '../data/products';
+import { CustomerFeedback } from '../components/CustomerFeedback';
+import { useBusinessSettings } from '../context/BusinessSettingsContext';
+import { api } from '../lib/api';
 const logoImg = "/logo.png";
 
 export const HomePage = ({ onOpenEnquiry }) => {
   const navigate = useNavigate();
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [selectedHeroCategory, setSelectedHeroCategory] = useState('all');
+  const { settings } = useBusinessSettings();
 
-  const displayedReviews = showAllReviews ? REVIEWS : REVIEWS.slice(0, 3);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const heroCategoryOptions = [
-    { id: 'all', name: 'All Products', label: 'All Products', count: '34 Items', icon: <LayoutGrid size={18} /> },
-    { id: 'furniture', name: 'Furniture', label: 'Furnitures & Cots', count: '13 Items', icon: <Armchair size={18} /> },
-    { id: 'home-appliances', name: 'Home Appliances', label: 'Home Appliances', count: '10 Items', icon: <Tv size={18} /> },
-    { id: 'kitchen-appliances', name: 'Kitchen Appliances', label: 'Kitchen Appliances', count: '11 Items', icon: <ChefHat size={18} /> }
-  ];
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const [fetchedCats, fetchedProds, fetchedReviews] = await Promise.all([
+        api.getCategories(),
+        api.getProducts(),
+        api.getApprovedReviews()
+      ]);
+      setCategories(fetchedCats);
+      setProducts(fetchedProds);
+      setReviews(fetchedReviews);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 3);
+
+  const getCategoryCount = (slug) => {
+    return products.filter(p => p.categories?.slug === slug || p.category_id === slug).length;
+  };
 
   const handleHeroCategorySubmit = (e) => {
     e?.preventDefault();
@@ -59,7 +78,14 @@ export const HomePage = ({ onOpenEnquiry }) => {
     }
   };
 
-  const currentCategoryObj = heroCategoryOptions.find(c => c.id === selectedHeroCategory) || heroCategoryOptions[0];
+  const getCategoryIcon = (slug) => {
+    if (slug === 'furniture') return <Armchair size={18} />;
+    if (slug === 'kitchen-appliances') return <ChefHat size={18} />;
+    if (slug === 'home-appliances' || slug === 'tv' || slug === 'ac') return <Tv size={18} />;
+    return <LayoutGrid size={18} />;
+  };
+
+  const currentCategoryObj = categories.find(c => c.slug === selectedHeroCategory) || { slug: 'all', icon: <LayoutGrid size={18} /> };
 
   // 4 Featured Categories for the 2x2 mobile grid and 4-column desktop grid
   const featuredCategories = [
@@ -68,7 +94,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
       name: "Furniture & Cots",
       desc: "Teakwood cots, luxury sofas & steel beros",
       link: "/products?category=furniture",
-      badge: "13 Items",
+      badge: `${getCategoryCount('furniture')} Models`,
       image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&auto=format&fit=crop&q=80"
     },
     {
@@ -76,7 +102,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
       name: "Kitchen Appliances",
       desc: "Heavy mixies, wet grinders & gas stoves",
       link: "/products?category=kitchen-appliances",
-      badge: "11 Items",
+      badge: `${getCategoryCount('kitchen-appliances')} Models`,
       image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&auto=format&fit=crop&q=80"
     },
     {
@@ -84,7 +110,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
       name: "Home Electronics",
       desc: "BLDC fans, geysers & inverter combos",
       link: "/products?category=home-appliances",
-      badge: "10 Items",
+      badge: `${getCategoryCount('home-appliances') + getCategoryCount('tv')} Models`,
       image: "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=600&auto=format&fit=crop&q=80"
     },
     {
@@ -114,9 +140,12 @@ export const HomePage = ({ onOpenEnquiry }) => {
                   <ShieldCheck size={16} />
                   <span>Jayankondam's Trusted Showroom</span>
                 </div>
-                <div className="hero-heritage-tag">
-                  <Sparkles size={14} className="sparkle-anim" />
-                  <span>ESTD. 1949</span>
+                <div className="hero-heritage-tag premium-heritage">
+                  <ShieldCheck size={14} className="text-gold" />
+                  <div className="heritage-col">
+                    <span className="heritage-label">Heritage of Trust</span>
+                    <span className="heritage-val">ESTD. 1949</span>
+                  </div>
                 </div>
               </div>
 
@@ -131,7 +160,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
               <div className="hero-subtagline-wrapper">
                 <p className="hero-subtagline">
                   <span className="hero-subtagline-spark">✨</span>
-                  {SITE_CONFIG.subTagline}
+                  Everything Your Home Needs, Under One Roof!
                 </p>
               </div>
 
@@ -142,13 +171,13 @@ export const HomePage = ({ onOpenEnquiry }) => {
                     <span className="hero-hub-dot"></span>
                     <span className="hero-hub-title">Select Product Category</span>
                   </div>
-                  <span className="hero-hub-count">34 Showroom Items</span>
+                  <span className="hero-hub-count">{products.length} Showroom Models</span>
                 </div>
 
                 <form onSubmit={handleHeroCategorySubmit} className="hero-finder-bar">
                   <div className="hero-dropdown-wrapper">
                     <div className="hero-dropdown-icon">
-                      {currentCategoryObj.icon}
+                      {getCategoryIcon(selectedHeroCategory)}
                     </div>
                     <select
                       id="hero-category-dropdown"
@@ -158,9 +187,11 @@ export const HomePage = ({ onOpenEnquiry }) => {
                       aria-label="Select product category"
                     >
                       <option value="all">All Products (Full Showroom)</option>
-                      <option value="furniture">Furnitures &amp; Cots (13 Items)</option>
-                      <option value="home-appliances">Home Appliances (10 Items)</option>
-                      <option value="kitchen-appliances">Kitchen Appliances (11 Items)</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.slug || cat.id}>
+                          {cat.name} ({getCategoryCount(cat.slug || cat.id)} Models)
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown size={16} className="hero-select-arrow" />
                   </div>
@@ -191,7 +222,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
               {/* Trust Stats Strip */}
               <div className="hero-stats-strip">
                 <div className="stat-item">
-                  <span className="stat-value">{SITE_CONFIG.yearsOfTrust}</span>
+                  <span className="stat-value">75+</span>
                   <span className="stat-label">Years of Trust</span>
                 </div>
                 <div className="stat-item">
@@ -264,16 +295,18 @@ export const HomePage = ({ onOpenEnquiry }) => {
                 to={cat.link}
                 className="category-card"
               >
-                <div className="category-img-wrap">
-                  <img
-                    src={cat.image}
-                    alt={`${cat.name} Collection`}
-                    loading="lazy"
-                  />
-                  <div className="category-badge-chip">
-                    {cat.badge}
+                  <div className="category-img-wrap">
+                    <img
+                      src={cat.image}
+                      alt={`${cat.name} Collection`}
+                      loading="lazy"
+                    />
+                    {cat.badge && (
+                      <div className="category-badge-chip">
+                        {cat.badge}
+                      </div>
+                    )}
                   </div>
-                </div>
 
                 <div className="category-content">
                   <div>
@@ -324,56 +357,8 @@ export const HomePage = ({ onOpenEnquiry }) => {
         </div>
       </section>
 
-      {/* Customer Reviews Section with Avatar Image Slots & Even Layout */}
-      <section className="section-padding" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-        <div className="container">
-          <div className="section-header">
-            <span className="section-badge">Customer Testimonials</span>
-            <h2 className="section-title">What Our Customers in Jayankondam Say</h2>
-            <p className="section-desc">
-              Real feedback from generations of families who rely on Aruna Radios &amp; Furniture.
-            </p>
-          </div>
-
-          <div className="reviews-grid">
-            {displayedReviews.map((rev) => (
-              <div key={rev.id} className="review-card">
-                <div>
-                  <div className="review-stars">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} size={16} fill="#f59e0b" color="#f59e0b" />
-                    ))}
-                  </div>
-                  <h3 className="review-title">"{rev.title}"</h3>
-                  <p className="review-comment">"{rev.comment}"</p>
-                </div>
-
-                <div className="reviewer-meta">
-                  <div className="reviewer-avatar-slot">
-                    {/* Render photo or stylish initials fallback */}
-                    {rev.name.charAt(0)}
-                  </div>
-                  <div className="reviewer-info">
-                    <span className="reviewer-name">{rev.name}</span>
-                    <span className="reviewer-loc">{rev.location} • {rev.role}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* View More / View Less Reviews Control */}
-          <div className="reviews-action-wrap">
-            <button
-              onClick={() => setShowAllReviews(!showAllReviews)}
-              className="btn btn-secondary"
-            >
-              <span>{showAllReviews ? 'Show Fewer Reviews' : `View More Reviews (${REVIEWS.length - 3} more)`}</span>
-              {showAllReviews ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* Customer Feedback Section */}
+      <CustomerFeedback />
 
       {/* Map, Address, Directions & Instagram Showcase */}
       <section className="section-padding">
@@ -396,12 +381,12 @@ export const HomePage = ({ onOpenEnquiry }) => {
                 <div className="info-content">
                   <span className="info-label">Store Address</span>
                   <span className="info-value">
-                    {SITE_CONFIG.contact.address.line1}<br />
-                    {SITE_CONFIG.contact.address.line2}<br />
-                    {SITE_CONFIG.contact.address.city}, {SITE_CONFIG.contact.address.state} - {SITE_CONFIG.contact.address.pincode}
+                    {settings.address_line1}<br />
+                    {settings.address_line2}<br />
+                    {settings.city}, {settings.state} - {settings.pincode}
                   </span>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                    ({SITE_CONFIG.contact.address.landmark})
+                    (Near Bus Stand, Jayankondam)
                   </span>
                 </div>
               </div>
@@ -412,11 +397,11 @@ export const HomePage = ({ onOpenEnquiry }) => {
                 </div>
                 <div className="info-content">
                   <span className="info-label">Direct Phone</span>
-                  <a href={`tel:${SITE_CONFIG.contact.phone.replace(/\s+/g, '')}`} className="info-value">
-                    {SITE_CONFIG.contact.phone}
+                  <a href={`tel:${(settings.phone_primary || '').replace(/\s+/g, '')}`} className="info-value">
+                    {settings.phone_primary}
                   </a>
                   <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                    Alt: {SITE_CONFIG.contact.altPhone}
+                    Alt: {settings.phone_secondary}
                   </span>
                 </div>
               </div>
@@ -427,16 +412,16 @@ export const HomePage = ({ onOpenEnquiry }) => {
                 </div>
                 <div className="info-content">
                   <span className="info-label">Showroom Hours</span>
-                  <span className="info-value">{SITE_CONFIG.contact.hours.weekday}</span>
+                  <span className="info-value">{settings.hours_weekday}</span>
                   <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                    {SITE_CONFIG.contact.hours.sunday}
+                    {settings.hours_sunday}
                   </span>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '0.65rem', marginTop: '0.35rem' }}>
                 <a
-                  href={SITE_CONFIG.contact.googleMapsDirectionsUrl}
+                  href={settings.google_maps_directions_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-primary"
@@ -447,7 +432,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
                 </a>
 
                 <a
-                  href={SITE_CONFIG.contact.instagramUrl}
+                  href={settings.instagram_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-secondary"
@@ -463,7 +448,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
             <div className="map-container" style={{ height: '340px' }}>
               <iframe
                 title="Aruna Radios & Furniture Location Map Jayankondam"
-                src={SITE_CONFIG.contact.googleMapsEmbedUrl}
+                src={settings.google_maps_embed_url}
                 width="100%"
                 height="100%"
                 loading="lazy"

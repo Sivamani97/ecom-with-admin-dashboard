@@ -1,0 +1,32 @@
+/* Add this to index.css or create a new css block */
+.premium-heritage {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.premium-heritage .text-gold {
+  color: #fbbf24;
+}
+.premium-heritage .heritage-col {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.premium-heritage .heritage-label {
+  font-size: 0.6rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+.premium-heritage .heritage-val {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.25px;
+}

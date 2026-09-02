@@ -12,9 +12,10 @@ import {
 import { InstagramIcon } from '../components/SocialIcons';
 import { SEO } from '../components/SEO';
 import { BackButton } from '../components/BackButton';
-import { SITE_CONFIG } from '../config/siteConfig';
+import { useBusinessSettings } from '../context/BusinessSettingsContext';
 
 export const ContactPage = () => {
+  const { settings } = useBusinessSettings();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -36,7 +37,7 @@ export const ContactPage = () => {
     }
     setFormError('');
 
-    const businessNumber = SITE_CONFIG.contact.whatsapp;
+    const businessNumber = settings.whatsapp_number || '919597589230';
     const textMsg = 
 `*Contact Form Message - Aruna Radios & Furniture*
 ----------------------------------------
@@ -88,12 +89,12 @@ _Sent from Website Contact Page_`;
                   <div className="info-content">
                     <span className="info-label">Address</span>
                     <span className="info-value">
-                      {SITE_CONFIG.contact.address.line1}<br />
-                      {SITE_CONFIG.contact.address.line2}<br />
-                      {SITE_CONFIG.contact.address.city}, {SITE_CONFIG.contact.address.state} - {SITE_CONFIG.contact.address.pincode}
+                      {settings.address_line1}<br />
+                      {settings.address_line2}<br />
+                      {settings.city}, {settings.state} - {settings.pincode}
                     </span>
                     <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                      Landmark: {SITE_CONFIG.contact.address.landmark}
+                      Landmark: Near Bus Stand, Jayankondam
                     </span>
                   </div>
                 </div>
@@ -105,11 +106,11 @@ _Sent from Website Contact Page_`;
                   <div className="info-content">
                     <span className="info-label">Phone Numbers</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                      <a href={`tel:${SITE_CONFIG.contact.phone.replace(/\s+/g, '')}`} className="info-value" style={{ color: 'var(--primary)' }}>
-                        {SITE_CONFIG.contact.phone} (Primary Store Line)
+                      <a href={`tel:${(settings.phone_primary || '').replace(/\s+/g, '')}`} className="info-value" style={{ color: 'var(--primary)' }}>
+                        {settings.phone_primary} (Primary Store Line)
                       </a>
-                      <a href={`tel:${SITE_CONFIG.contact.altPhone.replace(/\s+/g, '')}`} className="info-value">
-                        {SITE_CONFIG.contact.altPhone} (Enquiry Hotline)
+                      <a href={`tel:${(settings.phone_secondary || '').replace(/\s+/g, '')}`} className="info-value">
+                        {settings.phone_secondary} (Enquiry Hotline)
                       </a>
                     </div>
                   </div>
@@ -121,8 +122,8 @@ _Sent from Website Contact Page_`;
                   </div>
                   <div className="info-content">
                     <span className="info-label">Email Support</span>
-                    <a href={`mailto:${SITE_CONFIG.contact.email}`} className="info-value">
-                      {SITE_CONFIG.contact.email}
+                    <a href={`mailto:${settings.email}`} className="info-value">
+                      {settings.email}
                     </a>
                   </div>
                 </div>
@@ -133,16 +134,16 @@ _Sent from Website Contact Page_`;
                   </div>
                   <div className="info-content">
                     <span className="info-label">Business Hours</span>
-                    <span className="info-value">{SITE_CONFIG.contact.hours.weekday}</span>
+                    <span className="info-value">{settings.hours_weekday}</span>
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      {SITE_CONFIG.contact.hours.sunday}
+                      {settings.hours_sunday}
                     </span>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
                   <a
-                    href={SITE_CONFIG.contact.googleMapsDirectionsUrl}
+                    href={settings.google_maps_directions_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary"
@@ -153,7 +154,7 @@ _Sent from Website Contact Page_`;
                   </a>
 
                   <a
-                    href={SITE_CONFIG.contact.instagramUrl}
+                    href={settings.instagram_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-secondary"
@@ -168,7 +169,7 @@ _Sent from Website Contact Page_`;
               <div className="map-container" style={{ height: '240px' }}>
                 <iframe
                   title="Aruna Radios & Furniture Showroom Google Map"
-                  src={SITE_CONFIG.contact.googleMapsEmbedUrl}
+                  src={settings.google_maps_embed_url}
                   width="100%"
                   height="100%"
                   loading="lazy"

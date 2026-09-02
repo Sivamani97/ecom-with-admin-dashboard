@@ -1,27 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, X, Gift, ArrowRight } from 'lucide-react';
-import { SHOW_OFFER_POPUP, SITE_CONFIG } from '../config/siteConfig';
+import { SITE_CONFIG } from '../config/siteConfig';
+import { api } from '../lib/api';
 
 export const OfferPopup = ({ onClaimOffer }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [offerData, setOfferData] = useState(null);
 
   useEffect(() => {
-    // If switch is disabled in siteConfig, do not render or execute timer
-    if (!SHOW_OFFER_POPUP) return;
+    const fetchAndSchedule = async () => {
+      // Fetch the active offer from Supabase
+      const offer = await api.getActiveOffer();
 
-    try {
-      const hasSeenOffer = sessionStorage.getItem('hasSeenSeasonalOffer_v1');
-      if (!hasSeenOffer) {
-        const timer = setTimeout(() => {
-          setIsOpen(true);
-          sessionStorage.setItem('hasSeenSeasonalOffer_v1', 'true');
-        }, 2200);
+      // If no active offer exists, or the popup is disabled, do not show
+      if (!offer || !offer.popup_enabled) return;
 
-        return () => clearTimeout(timer);
+      setOfferData({
+        badge: offer.title,
+        title: offer.title,
+        discountText: offer.discount_percentage ? `Up to ${offer.discount_percentage}% OFF` : offer.title,
+        validTill: offer.valid_until ? `Offer valid till: ${new Date(offer.valid_until).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}` : 'Limited Period Offer',
+        description: offer.description,
+        ctaText: offer.cta_text || 'Claim Offer',
+        ctaUrl: offer.cta_url
+      });
+
+      try {
+        const hasSeenOffer = sessionStorage.getItem('hasSeenSeasonalOffer_v2');
+        if (!hasSeenOffer) {
+          const timer = setTimeout(() => {
+            setIsOpen(true);
+            sessionStorage.setItem('hasSeenSeasonalOffer_v2', 'true');
+          }, 2200);
+          return () => clearTimeout(timer);
+        }
+      } catch {
+        // ignore sessionStorage errors
       }
-    } catch {
-      // ignore
-    }
+    };
+
+    fetchAndSchedule();
   }, []);
 
   // Escape key + body scroll lock
@@ -41,7 +59,8 @@ export const OfferPopup = ({ onClaimOffer }) => {
     };
   }, [isOpen]);
 
-  if (!SHOW_OFFER_POPUP || !isOpen) return null;
+  // Only render if we have offer data and popup is open
+  if (!isOpen || !offerData) return null;
 
   const handleClose = () => {
     setIsOpen(false);
@@ -50,7 +69,7 @@ export const OfferPopup = ({ onClaimOffer }) => {
   const handleClaim = () => {
     handleClose();
     if (onClaimOffer) {
-      onClaimOffer(SITE_CONFIG.seasonalOffer.ctaProduct);
+      onClaimOffer(offerData.ctaUrl || 'General Enquiry');
     }
   };
 
@@ -87,10 +106,10 @@ export const OfferPopup = ({ onClaimOffer }) => {
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase'
               }}>
-                {SITE_CONFIG.seasonalOffer.badge}
+                Festival Special
               </span>
               <h3 style={{ fontSize: '1rem', fontWeight: '700', lineHeight: 1.2 }}>
-                {SITE_CONFIG.seasonalOffer.title}
+                {offerData.title}
               </h3>
             </div>
           </div>
@@ -119,10 +138,10 @@ export const OfferPopup = ({ onClaimOffer }) => {
               color: 'var(--accent-gold-dark)',
               marginBottom: '0.35rem'
             }}>
-              {SITE_CONFIG.seasonalOffer.discountText}
+              {offerData.discountText}
             </h4>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-              {SITE_CONFIG.seasonalOffer.validTill}
+              {offerData.validTill}
             </p>
           </div>
 
@@ -132,7 +151,7 @@ export const OfferPopup = ({ onClaimOffer }) => {
             lineHeight: 1.5,
             marginBottom: '1.5rem'
           }}>
-            {SITE_CONFIG.seasonalOffer.description}
+            {offerData.description}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -142,7 +161,7 @@ export const OfferPopup = ({ onClaimOffer }) => {
               style={{ width: '100%', padding: '0.85rem' }}
             >
               <Sparkles size={18} />
-              <span>{SITE_CONFIG.seasonalOffer.ctaText}</span>
+              <span>{offerData.ctaText}</span>
               <ArrowRight size={16} />
             </button>
 

@@ -1,10 +1,11 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { PhoneCall, Sparkles } from 'lucide-react';
-import { SITE_CONFIG } from '../config/siteConfig';
 import { ThemeToggle } from './ThemeToggle';
+import { useBusinessSettings } from '../context/BusinessSettingsContext';
 
 export const Navbar = () => {
+  const { settings } = useBusinessSettings();
   return (
     <header className="site-header">
       <div className="container header-inner">
@@ -45,7 +46,7 @@ export const Navbar = () => {
           <ThemeToggle />
           
           <a
-            href={`tel:${SITE_CONFIG.contact.phone.replace(/\s+/g, '')}`}
+            href={`tel:${(settings.phone_primary || '').replace(/\s+/g, '')}`}
             className="sticky-call-btn"
             title="Call Store Now"
           >
