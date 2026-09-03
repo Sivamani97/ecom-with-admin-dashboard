@@ -1225,20 +1225,28 @@ textarea.form-control {
 }
 
 .hero-title {
-  font-size: 2.2rem;
+  font-family: var(--font-display);
+  font-size: 2.1rem;
   font-weight: 900;
-  line-height: 1.15;
+  line-height: 1.12;
   color: var(--text-primary);
-  margin-bottom: 1.15rem;
-  letter-spacing: -0.025em;
+  margin-bottom: 1.1rem;
+  letter-spacing: -0.03em;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
 }
 
 @media (min-width: 768px) {
   .hero-title {
-    font-size: 3.35rem;
+    font-size: 3.2rem;
+    letter-spacing: -0.04em;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero-title {
+    font-size: 3.6rem;
   }
 }
 
@@ -2006,6 +2014,418 @@ textarea.form-control {
   .reviews-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* ==========================================================================
+   CustomerFeedback — Seamless Right-to-Left Marquee
+   ========================================================================== */
+
+/* Section wrapper: clip the marquee, no horizontal scroll on page */
+.cf-section {
+  overflow: hidden;
+}
+
+/* Marquee outer container — fades edges, clips overflow */
+.cf-marquee-container {
+  overflow: hidden;
+  width: 100%;
+  /* Edge fade for polished look */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  padding: 0.5rem 0 1.5rem 0;
+  cursor: default;
+}
+
+/* Marquee track — holds all duplicated items, animates left */
+.cf-marquee-track {
+  display: flex;
+  align-items: stretch;
+  gap: 1.25rem;
+  width: max-content;
+  animation: cfMarqueeScroll 55s linear infinite;
+  will-change: transform;
+  padding-bottom: 0.25rem; /* prevent shadow clipping */
+}
+
+/* Pause on hover (desktop) */
+@media (hover: hover) {
+  .cf-marquee-container:hover .cf-marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes cfMarqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Individual review card — fixed width so marquee is steady */
+.cf-review-card {
+  width: 310px;
+  flex-shrink: 0;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cf-review-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.09);
+}
+
+/* Skeleton placeholder */
+.cf-skeleton {
+  width: 310px;
+  height: 220px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border-color) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: cfSkeletonShimmer 1.5s infinite;
+  border-radius: var(--radius-lg);
+}
+
+@keyframes cfSkeletonShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Top row: stars + verified badge */
+.cf-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cf-verified-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #16a34a;
+  background-color: #dcfce7;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Review text */
+.cf-review-text {
+  font-size: 0.91rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  flex: 1;
+  /* Limit to 4 lines so cards stay consistent height */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* Optional customer photo slot */
+.cf-photo-slot {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.cf-photo-wrap {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--bg-tertiary);
+  cursor: pointer;
+}
+
+.cf-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.cf-photo-wrap:hover .cf-photo-img {
+  transform: scale(1.04);
+}
+
+.cf-photo-expand-hint {
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+}
+
+/* Fallback when photo fails to load */
+.cf-photo-fallback {
+  width: 100%;
+  height: 80px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  border: 1px dashed var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+/* Footer: name, location, date */
+.cf-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+.cf-reviewer-name {
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.15rem 0;
+  line-height: 1.2;
+}
+
+.cf-reviewer-loc {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.cf-review-date {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Empty state */
+.cf-empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--border-subtle);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.cf-empty-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin: 0 0 0.45rem 0;
+  color: var(--text-primary);
+}
+
+.cf-empty-desc {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0 0 1.35rem 0;
+}
+
+/* Reduced motion: stop animation, show static scrollable row */
+@media (prefers-reduced-motion: reduce) {
+  .cf-marquee-track {
+    animation: none !important;
+  }
+  .cf-marquee-container {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* ==========================================================================
+   Offers Page — Featured Banner & Card Styles
+   ========================================================================== */
+
+.offer-featured-card {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.07) 0%, rgba(37, 99, 235, 0.06) 100%);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--accent-gold);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Offer image banner */
+.offer-banner-img-wrap {
+  width: 100%;
+  max-height: 320px;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-tertiary);
+}
+
+@media (min-width: 768px) {
+  .offer-banner-img-wrap {
+    max-height: 380px;
+  }
+}
+
+.offer-banner-img {
+  width: 100%;
+  height: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .offer-banner-img {
+    max-height: 380px;
+  }
+}
+
+.offer-featured-body {
+  padding: 1.75rem 2rem;
+}
+
+@media (max-width: 640px) {
+  .offer-featured-body {
+    padding: 1.25rem;
+  }
+}
+
+.offer-featured-badge {
+  background-color: var(--accent-gold);
+  color: #000000;
+  font-weight: 800;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: inline-block;
+}
+
+.offer-featured-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .offer-featured-title {
+    font-size: 1.75rem;
+  }
+}
+
+.offer-discount-pill {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--accent-gold-dark);
+  background: rgba(251, 191, 36, 0.18);
+  border: 1.5px solid var(--accent-gold);
+  padding: 0.35rem 1rem;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.offer-combo-box {
+  padding: 0.9rem 1.1rem;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 0.5rem;
+}
+
+.offer-standard-card {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  padding: 1.75rem 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 640px) {
+  .offer-standard-card {
+    padding: 1.25rem;
+  }
+}
+
+.offer-standard-badge {
+  background-color: var(--accent-gold-light);
+  color: var(--accent-gold-dark);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+
+.offer-standard-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .offer-standard-title {
+    font-size: 1.45rem;
+  }
+}
+
+.offer-standard-discount {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* spin animation for loading state */
+.spin-anim {
+  animation: spinOnce 1s linear infinite;
+}
+
+@keyframes spinOnce {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .review-card {

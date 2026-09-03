@@ -545,7 +545,7 @@ export const ProductsManager = () => {
               </p>
               <button onClick={openAddProductModal} className="admin-btn admin-btn-primary">
                 <Plus size={16} />
-                <span>+ Add Product</span>
+                <span>Add Product</span>
               </button>
             </div>
           ) : (
