@@ -57,7 +57,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
   const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 3);
 
   const getCategoryCount = (slug) => {
-    return products.filter(p => p.categories?.slug === slug || p.category_id === slug).length;
+    return (products || []).filter(p => p.categories?.slug === slug || p.category_id === slug || p.category === slug).length;
   };
 
   const handleHeroCategorySubmit = (e) => {

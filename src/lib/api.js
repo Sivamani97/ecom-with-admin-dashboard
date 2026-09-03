@@ -1,34 +1,57 @@
 import { supabase } from './supabase';
+import { PRODUCTS, PRODUCT_CATEGORIES } from '../data/products';
 
 export const api = {
   // Products & Categories
   async getCategories() {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
-    
-    if (error) {
-      console.error('Error fetching categories:', error);
-      return [];
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      
+      if (error || !data || data.length === 0) {
+        if (error) console.error('Error fetching categories from Supabase, using fallback:', error);
+        return PRODUCT_CATEGORIES.map(c => ({
+          id: c.id,
+          name: c.name,
+          slug: c.id,
+          icon: c.icon,
+          desc: c.desc
+        }));
+      }
+      return data;
+    } catch (err) {
+      console.error('Exception fetching categories:', err);
+      return PRODUCT_CATEGORIES.map(c => ({
+        id: c.id,
+        name: c.name,
+        slug: c.id,
+        icon: c.icon,
+        desc: c.desc
+      }));
     }
-    return data;
   },
 
   async getProducts() {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, categories(name, slug)')
-      .eq('is_visible', true)
-      .order('display_order', { ascending: true })
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching products:', error);
-      return [];
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, categories(name, slug)')
+        .eq('is_visible', true)
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false });
+      
+      if (error || !data || data.length === 0) {
+        if (error) console.error('Error fetching products from Supabase, using fallback:', error);
+        return PRODUCTS;
+      }
+      return data;
+    } catch (err) {
+      console.error('Exception fetching products:', err);
+      return PRODUCTS;
     }
-    return data;
   },
 
   // Reviews

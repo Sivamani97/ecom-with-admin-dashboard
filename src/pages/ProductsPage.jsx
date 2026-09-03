@@ -20,13 +20,14 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
   const initialCategory = searchParams.get('category') || 'all';
 
   const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductDetail, setSelectedProductDetail] = useState(null);
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch dynamic data from Supabase
+  // Fetch dynamic data from Supabase / Fallback
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -34,8 +35,8 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
         api.getProducts(),
         api.getCategories()
       ]);
-      setProducts(fetchedProducts);
-      setCategories(fetchedCategories);
+      setProducts(fetchedProducts || []);
+      setCategories(fetchedCategories || []);
       setLoading(false);
     };
     loadData();
@@ -78,13 +79,25 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
     }
   };
 
-  // Filter products based on active category
+  // Filter products based on active category and search query
   const filteredProducts = useMemo(() => {
     return products.filter((item) => {
-      const matchesCategory = activeCategory === 'all' || item.categories?.slug === activeCategory || item.category_id === activeCategory;
-      return matchesCategory;
+      const itemCat = item.categories?.slug || item.category_id || item.category;
+      const matchesCategory = activeCategory === 'all' || itemCat === activeCategory;
+
+      if (!matchesCategory) return false;
+
+      if (!searchQuery.trim()) return true;
+
+      const q = searchQuery.toLowerCase().trim();
+      const nameMatch = item.name?.toLowerCase().includes(q);
+      const brandMatch = item.brand?.toLowerCase().includes(q) || (Array.isArray(item.popularBrands) && item.popularBrands.some(b => b.toLowerCase().includes(q)));
+      const highlightMatch = item.highlight?.toLowerCase().includes(q);
+      const featuresMatch = Array.isArray(item.features) && item.features.some(f => f.toLowerCase().includes(q));
+
+      return nameMatch || brandMatch || highlightMatch || featuresMatch;
     });
-  }, [activeCategory, products]);
+  }, [activeCategory, searchQuery, products]);
 
   return (
     <>
@@ -105,16 +118,56 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             </p>
           </div>
 
-          {/* Category Tabs */}
-          <div className="catalog-search-bar" style={{ justifyContent: 'flex-start' }}>
-            <div className="hero-dropdown-wrapper" style={{ width: '100%', maxWidth: '300px' }}>
+          {/* Controls: Search Bar & Category Dropdown */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center' }}>
+            {/* Text Search Input */}
+            <div style={{ position: 'relative', flex: '1', minWidth: '240px' }}>
+              <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Search by name, brand, or feature..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                  outline: 'none'
+                }}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer'
+                  }}
+                  aria-label="Clear search"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+
+            {/* Category Dropdown */}
+            <div className="hero-dropdown-wrapper" style={{ width: '100%', maxWidth: '280px' }}>
               <select
                 className="hero-category-select"
                 value={activeCategory}
                 onChange={(e) => handleCategoryChange(e.target.value)}
                 aria-label="Filter products by category"
               >
-                <option value="all">All Products</option>
+                <option value="all">All Product Categories</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.slug || cat.id}>
                     {cat.name}
@@ -130,11 +183,12 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>
               Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'Model' : 'Models'}
               {activeCategory !== 'all' && ` in ${categories.find(c => c.slug === activeCategory || c.id === activeCategory)?.name || 'Selected Category'}`}
+              {searchQuery && ` matching "${searchQuery}"`}
             </span>
 
-            {activeCategory !== 'all' && (
+            {(activeCategory !== 'all' || searchQuery) && (
               <button
-                onClick={() => { setActiveCategory('all'); setSearchParams({}); }}
+                onClick={() => { setActiveCategory('all'); setSearchQuery(''); setSearchParams({}); }}
                 className="btn btn-outline btn-sm"
               >
                 Reset Filters
@@ -150,73 +204,84 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             </div>
           ) : filteredProducts.length > 0 ? (
             <div className="products-grid">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="product-card">
-                  {/* Image Frame */}
-                  <div className="product-img-wrap">
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      loading="lazy"
-                    />
-                    {product.tag && (
-                      <span className="product-tag-badge">
-                        {product.tag}
-                      </span>
-                    )}
-                    {product.categories?.name && (
-                      <span className="product-category-chip">
-                        {product.categories.name}
-                      </span>
-                    )}
-                  </div>
+              {filteredProducts.map((product) => {
+                const imgSrc = product.image_url || product.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&auto=format&fit=crop&q=80';
+                const catName = product.categories?.name || product.categoryLabel || (categories.find(c => c.slug === product.category_id || c.id === product.category_id)?.name);
+                const featuresList = Array.isArray(product.features) ? product.features : [];
+                const brandsList = Array.isArray(product.popularBrands) ? product.popularBrands : product.brand ? [product.brand] : [];
 
-                  {/* Details */}
-                  <div className="product-details">
-                    <h3 className="product-title">{product.name}</h3>
-                    <p className="product-highlight">{product.highlight}</p>
+                return (
+                  <div key={product.id} className="product-card">
+                    {/* Image Frame */}
+                    <div className="product-img-wrap">
+                      <img
+                        src={imgSrc}
+                        alt={product.name}
+                        loading="lazy"
+                      />
+                      {product.tag && (
+                        <span className="product-tag-badge">
+                          {product.tag}
+                        </span>
+                      )}
+                      {catName && (
+                        <span className="product-category-chip">
+                          {catName}
+                        </span>
+                      )}
+                    </div>
 
-                    {/* Features list */}
-                    <div style={{ marginBottom: '0.85rem' }}>
-                      {product.features.slice(0, 2).map((feat, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
-                          <Check size={13} color="var(--success)" style={{ flexShrink: 0 }} />
-                          <span>{feat}</span>
+                    {/* Details */}
+                    <div className="product-details">
+                      <h3 className="product-title">{product.name}</h3>
+                      {product.highlight && <p className="product-highlight">{product.highlight}</p>}
+
+                      {/* Features list */}
+                      {featuresList.length > 0 && (
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          {featuresList.slice(0, 2).map((feat, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                              <Check size={13} color="var(--success)" style={{ flexShrink: 0 }} />
+                              <span>{feat}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      )}
 
-                    {/* Popular Brands Tags */}
-                    <div className="product-brands-row">
-                      {product.popularBrands.map((brand, i) => (
-                        <span key={i} className="product-brand-tag">{brand}</span>
-                      ))}
-                    </div>
+                      {/* Popular Brands Tags */}
+                      {brandsList.length > 0 && (
+                        <div className="product-brands-row">
+                          {brandsList.map((brand, i) => (
+                            <span key={i} className="product-brand-tag">{brand}</span>
+                          ))}
+                        </div>
+                      )}
 
-                    {/* Actions */}
-                    <div className="product-footer-actions">
-                      <button
-                        onClick={() => setSelectedProductDetail(product)}
-                        className="btn btn-secondary btn-sm"
-                        style={{ flex: 1 }}
-                        title="View specifications"
-                      >
-                        <Info size={14} />
-                        <span>Specs</span>
-                      </button>
+                      {/* Actions */}
+                      <div className="product-footer-actions">
+                        <button
+                          onClick={() => setSelectedProductDetail(product)}
+                          className="btn btn-secondary btn-sm"
+                          style={{ flex: 1 }}
+                          title="View specifications"
+                        >
+                          <Info size={14} />
+                          <span>Specs</span>
+                        </button>
 
-                      <button
-                        onClick={() => onOpenEnquiry && onOpenEnquiry(product.name)}
-                        className="btn btn-whatsapp btn-sm"
-                        style={{ flex: 1.5 }}
-                      >
-                        <MessageCircle size={15} />
-                        <span>WhatsApp</span>
-                      </button>
+                        <button
+                          onClick={() => onOpenEnquiry && onOpenEnquiry(product.name)}
+                          className="btn btn-whatsapp btn-sm"
+                          style={{ flex: 1.5 }}
+                        >
+                          <MessageCircle size={15} />
+                          <span>WhatsApp</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div style={{
@@ -254,7 +319,7 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             <div className="modal-header">
               <div>
                 <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase' }}>
-                  {selectedProductDetail.categories?.name}
+                  {selectedProductDetail.categories?.name || selectedProductDetail.categoryLabel}
                 </span>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>
                   {selectedProductDetail.name}
@@ -272,7 +337,7 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
             <div className="modal-body">
               <div style={{ height: '220px', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '1.25rem' }}>
                 <img
-                  src={selectedProductDetail.image_url}
+                  src={selectedProductDetail.image_url || selectedProductDetail.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&auto=format&fit=crop&q=80'}
                   alt={selectedProductDetail.name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
@@ -287,22 +352,28 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-gold-dark)', fontWeight: 700, fontSize: '0.88rem', marginBottom: '0.35rem' }}>
                   <ShieldCheck size={18} />
-                  <span>{selectedProductDetail.warranty}</span>
+                  <span>{selectedProductDetail.warranty || 'Official Brand Warranty'}</span>
                 </div>
-                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
-                  {selectedProductDetail.highlight}
-                </p>
+                {selectedProductDetail.highlight && (
+                  <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
+                    {selectedProductDetail.highlight}
+                  </p>
+                )}
               </div>
 
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.6rem' }}>Key Features &amp; Specifications:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                {selectedProductDetail.features.map((feat, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
-                    <Check size={16} color="var(--success)" />
-                    <span>{feat}</span>
+              {Array.isArray(selectedProductDetail.features) && selectedProductDetail.features.length > 0 && (
+                <>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.6rem' }}>Key Features &amp; Specifications:</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                    {selectedProductDetail.features.map((feat, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                        <Check size={16} color="var(--success)" />
+                        <span>{feat}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
 
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <button
