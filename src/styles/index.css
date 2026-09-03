@@ -2025,38 +2025,43 @@ textarea.form-control {
   overflow: hidden;
 }
 
-/* Marquee outer container — fades edges, clips overflow */
-.cf-marquee-container {
-  overflow: hidden;
+/* Customer Reviews User-Controlled Horizontal Scroll Container */
+.cf-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
   width: 100%;
-  /* Edge fade for polished look */
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
-  padding: 0.5rem 0 1.5rem 0;
-  cursor: default;
+  padding: 0.5rem 0.5rem 1.25rem 0.5rem;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
 }
 
-/* Marquee track — holds all duplicated items, animates left */
-.cf-marquee-track {
+.cf-scroll-track {
   display: flex;
   align-items: stretch;
   gap: 1.25rem;
   width: max-content;
-  animation: cfMarqueeScroll 55s linear infinite;
-  will-change: transform;
-  padding-bottom: 0.25rem; /* prevent shadow clipping */
+  padding-bottom: 0.5rem;
 }
 
-/* Pause on hover (desktop) */
-@media (hover: hover) {
-  .cf-marquee-container:hover .cf-marquee-track {
-    animation-play-state: paused;
-  }
+.cf-scroll-track .cf-review-card {
+  scroll-snap-align: start;
 }
 
-@keyframes cfMarqueeScroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+/* Custom styled horizontal scrollbar */
+.cf-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+.cf-scroll-container::-webkit-scrollbar-track {
+  background: var(--bg-tertiary, #f1f5f9);
+  border-radius: 999px;
+}
+.cf-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--accent-gold, #d97706);
+  border-radius: 999px;
+}
+.cf-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #b45309;
 }
 
 /* Individual review card — fixed width so marquee is steady */

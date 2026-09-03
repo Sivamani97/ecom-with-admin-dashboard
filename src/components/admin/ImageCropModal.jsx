@@ -184,34 +184,43 @@ export const ImageCropModal = ({ isOpen, onClose, onImageProcessed, initialImage
 
       if (!blob) throw new Error('Image compression failed');
 
-      // Upload to Supabase Storage
-      const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
-      const filePath = `products/${fileName}`;
+      let finalImageUrl = null;
 
-      // Verify admin session before storage upload
-      const authCheck = await getAdminSession();
-      if (!authCheck.isAdmin) {
-        throw new Error(authCheck.error || 'Admin authorization required to upload images.');
+      try {
+        const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+        const filePath = `products/${fileName}`;
+
+        // Verify admin session before storage upload
+        const authCheck = await getAdminSession();
+        if (authCheck.isAdmin) {
+          const { error: uploadError } = await supabase.storage
+            .from('product-images')
+            .upload(filePath, blob, {
+              contentType: 'image/jpeg',
+              cacheControl: '3600',
+              upsert: true
+            });
+
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage
+              .from('product-images')
+              .getPublicUrl(filePath);
+
+            if (urlData?.publicUrl) {
+              finalImageUrl = urlData.publicUrl;
+            }
+          }
+        }
+      } catch (storageErr) {
+        console.warn('Storage upload error, using Data URL fallback:', storageErr);
       }
 
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, blob, {
-          contentType: 'image/jpeg',
-          cacheControl: '3600',
-          upsert: true
-        });
+      // Data URL fallback if storage is unconfigured or returns error
+      if (!finalImageUrl) {
+        finalImageUrl = canvas.toDataURL('image/jpeg', 0.85);
+      }
 
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      if (!urlData?.publicUrl) throw new Error('Failed to obtain image public URL');
-
-      onImageProcessed(urlData.publicUrl);
+      onImageProcessed(finalImageUrl);
       onClose();
     } catch (err) {
       console.error('Image crop & upload error:', err);
@@ -253,19 +262,30 @@ export const ImageCropModal = ({ isOpen, onClose, onImageProcessed, initialImage
             </div>
           )}
 
-          {/* Hidden File Input */}
+          {/* Android WebView Compatible File Input */}
           <input 
             type="file" 
+            id="product-image-crop-file-input"
             ref={fileInputRef} 
             onChange={handleFileSelect} 
-            accept="image/*" 
-            style={{ display: 'none' }} 
+            accept="image/*,image/jpeg,image/png,image/webp,image/heic,image/heif" 
+            style={{
+              position: 'absolute',
+              width: '1px',
+              height: '1px',
+              padding: 0,
+              margin: '-1px',
+              overflow: 'hidden',
+              clip: 'rect(0, 0, 0, 0)',
+              whiteSpace: 'nowrap',
+              border: 0,
+            }}
           />
 
           {!imageSrc ? (
-            /* Empty upload dropzone */
-            <div 
-              onClick={() => fileInputRef.current?.click()}
+            /* Empty upload dropzone with direct label trigger */
+            <label 
+              htmlFor="product-image-crop-file-input"
               style={{
                 border: '2px dashed var(--admin-border)',
                 borderRadius: '16px',
@@ -288,10 +308,10 @@ export const ImageCropModal = ({ isOpen, onClose, onImageProcessed, initialImage
                   Tap to upload high-res image from camera or library
                 </p>
               </div>
-              <button type="button" className="admin-btn admin-btn-primary admin-btn-sm">
+              <span className="admin-btn admin-btn-primary admin-btn-sm">
                 Select Photo
-              </button>
-            </div>
+              </span>
+            </label>
           ) : (
             <div>
               {/* Interactive Framing Viewport (Aspect ratio 4:3) */}

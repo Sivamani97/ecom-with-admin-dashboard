@@ -43,14 +43,14 @@ export const api = {
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
       
-      if (error || !data || data.length === 0) {
-        if (error) console.error('Error fetching products from Supabase, using fallback:', error);
-        return PRODUCTS;
+      if (error) {
+        console.error('Error fetching products from Supabase:', error);
+        return [];
       }
-      return data;
+      return data || [];
     } catch (err) {
       console.error('Exception fetching products:', err);
-      return PRODUCTS;
+      return [];
     }
   },
 

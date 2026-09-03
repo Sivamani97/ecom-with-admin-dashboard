@@ -283,6 +283,27 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
                 );
               })}
             </div>
+          ) : products.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '4rem 1.5rem',
+              backgroundColor: 'var(--bg-card)',
+              borderRadius: 'var(--radius-xl)',
+              border: '1px solid var(--border-color)'
+            }}>
+              <Sparkles size={48} color="var(--accent-gold, #d97706)" style={{ margin: '0 auto 1rem auto' }} />
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>No Products Added Yet</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '1.5rem', maxWidth: '480px', margin: '0 auto 1.5rem auto' }}>
+                The product catalog is currently empty. Products added from the Admin Dashboard will automatically appear here.
+              </p>
+              <button
+                onClick={() => onOpenEnquiry && onOpenEnquiry('Product Catalog Enquiry')}
+                className="btn btn-whatsapp"
+              >
+                <MessageCircle size={18} />
+                <span>Enquire Direct on WhatsApp</span>
+              </button>
+            </div>
           ) : (
             <div style={{
               textAlign: 'center',

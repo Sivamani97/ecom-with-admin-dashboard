@@ -41,7 +41,8 @@ const ReviewCard = ({ rev, onPhotoClick }) => {
       })
     : null;
 
-  const hasPhoto = rev.avatar_url && !imgError;
+  const photoUrl = rev.avatar_url || rev.avatarImage || rev.photo_url || rev.photo || rev.image_url || rev.image;
+  const hasPhoto = Boolean(photoUrl) && !imgError;
 
   return (
     <div className="cf-review-card">
@@ -58,16 +59,16 @@ const ReviewCard = ({ rev, onPhotoClick }) => {
       <p className="cf-review-text">"{rev.review_text}"</p>
 
       {/* Optional customer photo */}
-      {rev.avatar_url && (
+      {photoUrl && (
         <div className="cf-photo-slot">
           {hasPhoto ? (
             <div
               className="cf-photo-wrap"
-              onClick={() => onPhotoClick(rev.avatar_url)}
+              onClick={() => onPhotoClick(photoUrl)}
               title="Click to view full photo"
             >
               <img
-                src={rev.avatar_url}
+                src={photoUrl}
                 alt={`Photo by ${rev.customer_name}`}
                 className="cf-photo-img"
                 loading="lazy"
@@ -199,30 +200,42 @@ export const CustomerFeedback = () => {
 
       // 1. Upload photo if customer attached one
       if (photoFile) {
-        const ext = photoFile.name.split('.').pop() || 'jpg';
-        const fileName = `review_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
-        const filePath = `customer_photos/${fileName}`;
+        try {
+          const ext = photoFile.name.split('.').pop() || 'jpg';
+          const fileName = `review_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+          const filePath = `customer_photos/${fileName}`;
 
-        const { error: uploadErr } = await supabase.storage
-          .from('review-images')
-          .upload(filePath, photoFile, {
-            contentType: photoFile.type,
-            cacheControl: '3600',
-            upsert: true,
-          });
-
-        if (!uploadErr) {
-          const { data: urlData } = supabase.storage
+          const { error: uploadErr } = await supabase.storage
             .from('review-images')
-            .getPublicUrl(filePath);
+            .upload(filePath, photoFile, {
+              contentType: photoFile.type,
+              cacheControl: '3600',
+              upsert: true,
+            });
 
-          if (urlData?.publicUrl) {
-            uploadedPhotoUrl = urlData.publicUrl;
+          if (!uploadErr) {
+            const { data: urlData } = supabase.storage
+              .from('review-images')
+              .getPublicUrl(filePath);
+
+            if (urlData?.publicUrl) {
+              uploadedPhotoUrl = urlData.publicUrl;
+            }
+          } else {
+            console.warn('Review photo upload notice:', uploadErr.message);
           }
-        } else {
-          // NOTE: If photos are not loading publicly, ensure the Supabase
-          // "review-images" Storage bucket is set to PUBLIC in the Supabase dashboard.
-          console.warn('Review photo upload notice:', uploadErr.message);
+        } catch (storageErr) {
+          console.warn('Storage upload error, using Data URL fallback:', storageErr);
+        }
+
+        // Fallback to Data URL if storage public URL was not created
+        if (!uploadedPhotoUrl) {
+          uploadedPhotoUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target?.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(photoFile);
+          });
         }
       }
 
@@ -245,16 +258,6 @@ export const CustomerFeedback = () => {
       setSubmitting(false);
     }
   };
-
-  /* ── Marquee: duplicate items for seamless loop ── */
-  // Only duplicate when there are reviews; use a minimum of 2 copies
-  // so the loop works even with just 1–2 reviews.
-  const marqueeItems =
-    reviews.length > 0
-      ? reviews.length < 4
-        ? [...reviews, ...reviews, ...reviews] // triple for short lists
-        : [...reviews, ...reviews]             // double is enough for larger sets
-      : [];
 
   /* ── Lightbox handler ── */
   const openLightbox = (url) => {
@@ -293,7 +296,7 @@ export const CustomerFeedback = () => {
         </div>
       </div>
 
-      {/* ── Reviews Marquee / Loading / Empty ── */}
+      {/* ── User-Controlled Horizontal Scroll List (Stopped Auto Marquee) ── */}
       {loading ? (
         /* Skeleton loader */
         <div className="container">
@@ -318,12 +321,12 @@ export const CustomerFeedback = () => {
           </div>
         </div>
       ) : (
-        /* Seamless right-to-left marquee */
-        <div className="cf-marquee-container" aria-label="Customer reviews carousel">
-          <div className="cf-marquee-track">
-            {marqueeItems.map((rev, idx) => (
+        /* User horizontal scroll container */
+        <div className="cf-scroll-container" aria-label="Customer reviews scrollable list">
+          <div className="cf-scroll-track">
+            {reviews.map((rev) => (
               <ReviewCard
-                key={`${rev.id}-${idx}`}
+                key={rev.id}
                 rev={rev}
                 onPhotoClick={openLightbox}
               />
@@ -458,10 +461,21 @@ export const CustomerFeedback = () => {
 
                     <input
                       type="file"
+                      id="customer-review-photo-input"
                       ref={fileInputRef}
                       onChange={handlePhotoSelect}
-                      accept="image/jpeg,image/png,image/webp"
-                      style={{ display: 'none' }}
+                      accept="image/*,image/jpeg,image/png,image/webp,image/heic,image/heif"
+                      style={{
+                        position: 'absolute',
+                        width: '1px',
+                        height: '1px',
+                        padding: 0,
+                        margin: '-1px',
+                        overflow: 'hidden',
+                        clip: 'rect(0, 0, 0, 0)',
+                        whiteSpace: 'nowrap',
+                        border: 0,
+                      }}
                     />
 
                     {photoPreview ? (
@@ -490,15 +504,14 @@ export const CustomerFeedback = () => {
                         </button>
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
+                      <label
+                        htmlFor="customer-review-photo-input"
                         className="btn btn-secondary btn-sm"
-                        style={{ width: '100%', justifyContent: 'center', borderStyle: 'dashed' }}
+                        style={{ width: '100%', justifyContent: 'center', borderStyle: 'dashed', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                       >
                         <Camera size={15} />
                         <span>Add a photo (optional)</span>
-                      </button>
+                      </label>
                     )}
                     <span style={{ fontSize: '0.71rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.3rem' }}>
                       Allowed: JPG, PNG, WebP · Max 5 MB
