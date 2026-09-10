@@ -460,7 +460,7 @@ export const ProductsManager = () => {
               className="admin-btn admin-btn-primary"
             >
               <Plus size={16} />
-              <span>+ Add Product</span>
+              <span>Add Product</span>
             </button>
           ) : (
             <button 
