@@ -350,7 +350,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-gold-dark)', fontWeight: 800, fontSize: '0.88rem' }}>
                 <CheckCircle2 size={17} />
-                <span>100% Brand Warranty &amp; Doorstep Delivery</span>
+                <span>100% Brand Warranty </span>
               </div>
             </div>
           </div>
