@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Package, Phone, Info } from 'lucide-react';
+import { Home, Package, Gift, Phone, Info } from 'lucide-react';
 
 export const MobileBottomNav = () => {
   return (
@@ -28,6 +28,19 @@ export const MobileBottomNav = () => {
             {isActive && <div className="mobile-nav-indicator" />}
             <Package size={20} />
             <span>Products</span>
+          </>
+        )}
+      </NavLink>
+
+      <NavLink
+        to="/offers"
+        className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
+      >
+        {({ isActive }) => (
+          <>
+            {isActive && <div className="mobile-nav-indicator" />}
+            <Gift size={20} />
+            <span>Offers</span>
           </>
         )}
       </NavLink>
