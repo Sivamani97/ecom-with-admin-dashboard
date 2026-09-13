@@ -46,7 +46,7 @@ export const SettingsManager = () => {
     phone_primary: '+91 9597589230',
     phone_secondary: '+91 98424 12345',
     whatsapp_number: '919597589230',
-    email: 'arunaradios.jayankondam@gmail.com',
+    email: 'arunaradios.ars@gmail.com',
     hours_weekday: 'Monday – Saturday: 9:00 AM – 9:00 PM',
     hours_sunday: 'Sunday: 10:00 AM – 8:00 PM',
     instagram_url: 'https://www.instagram.com/aruna_radios_furnitures',
