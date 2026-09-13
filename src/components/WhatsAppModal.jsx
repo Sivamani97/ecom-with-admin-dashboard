@@ -68,14 +68,14 @@ export const WhatsAppModal = ({ isOpen, onClose, initialProduct = '', defaultOpe
     const businessNumber = settings.whatsapp_number || '919597589230';
     
     // Construct structured WhatsApp message
-    const message = 
+    const message =
 `*New Enquiry - Aruna Radios & Furniture*
 ---------------------------------------
 📱 *Customer Phone:* ${phoneNumber.trim()}
 🏷️ *Product / Requirement:* ${product.trim() || 'General Store Enquiry'}
 📝 *Details / Message:* ${description.trim() || 'Please share best price, availability and festival discounts.'}
 ---------------------------------------
-_Sent via arunaradiosandfurniture.com_`;
+_Sent via www.arunafurnitures.in_`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${businessNumber}?text=${encodedMessage}`;

@@ -58,9 +58,9 @@ _Sent from Website Contact Page_`;
   return (
     <>
       <SEO
-        title="Contact Us - Store Location & Hours in Jayankondam"
-        description="Get in touch with Aruna Radios & Furniture in Jayankondam. Phone numbers, showroom address, working hours, and Google Map directions."
-      />
+  title="Contact Us & Store Location"
+  description="Contact Aruna Radios & Furniture in Jayankondam, Tamil Nadu. Find our showroom at 103A, Bazaar Street, opposite PVR Lodge, and get directions, phone and store information."
+/>
 
       <BackButton label="Back to Home" to="/" />
 

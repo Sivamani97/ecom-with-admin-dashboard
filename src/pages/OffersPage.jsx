@@ -42,9 +42,9 @@ export const OffersPage = ({ onOpenEnquiry }) => {
   return (
     <>
       <SEO
-        title="Festival Offers & Deals - Aruna Radios & Furniture"
-        description="Exclusive festive discounts, appliance exchange schemes, and wedding furniture combo deals at Aruna Radios & Furniture Jayankondam."
-      />
+  title="Festival Offers & Deals"
+  description="Discover current festive offers, appliance exchange schemes and furniture deals at Aruna Radios & Furniture in Jayankondam, Tamil Nadu."
+/>
 
       <BackButton label="Back to Home" to="/" />
 

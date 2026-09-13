@@ -1,45 +1,104 @@
 import { useEffect } from 'react';
 
-export const SEO = ({ title, description, keywords, image, canonicalUrl }) => {
+export const SEO = ({
+  title,
+  description,
+  image,
+  canonicalUrl,
+  noindex = false
+}) => {
   useEffect(() => {
-    const fullTitle = title 
+    const fullTitle = title
       ? `${title} | Aruna Radios & Furniture – Jayankondam`
-      : 'Aruna Radios & Furniture – Jayankondam | Since 1949';
+      : 'Aruna Radios & Furniture | Electronics & Furniture in Jayankondam';
+
+    const defaultDescription =
+      'Aruna Radios & Furniture is a trusted electronics, home appliances and furniture showroom in Jayankondam, Tamil Nadu. Shop TVs, refrigerators, washing machines, furniture and more.';
+
+    const defaultImage =
+      'https://www.arunafurnitures.in/logo.png';
 
     document.title = fullTitle;
 
-    // Update Meta Tag function helper
+    // Helper to update existing meta tags
     const setMetaTag = (selector, attributeName, value) => {
       if (!value) return;
-      let tag = document.querySelector(selector);
+
+      const tag = document.querySelector(selector);
+
       if (tag) {
         tag.setAttribute(attributeName, value);
       }
     };
 
-    // Standard Meta Tags
-    setMetaTag("meta[name='description']", 'content', description);
-    setMetaTag("meta[name='keywords']", 'content', keywords);
+    const metaDescription = description || defaultDescription;
+    const metaImage = image || defaultImage;
 
-    // Open Graph Tags
-    setMetaTag("meta[property='og:title']", 'content', fullTitle);
-    setMetaTag("meta[property='og:description']", 'content', description);
-    setMetaTag("meta[property='og:image']", 'content', image || 'https://arunaradiosandfurniture.com/logo.png');
+    // Standard Meta
+    setMetaTag(
+      "meta[name='description']",
+      'content',
+      metaDescription
+    );
+// Robots Meta
+setMetaTag(
+  "meta[name='robots']",
+  'content',
+  noindex ? 'noindex, nofollow' : 'index, follow'
+);
+    // Open Graph
+    setMetaTag(
+      "meta[property='og:title']",
+      'content',
+      fullTitle
+    );
 
-    // Twitter Card Tags
-    setMetaTag("meta[name='twitter:title']", 'content', fullTitle);
-    setMetaTag("meta[name='twitter:description']", 'content', description);
-    setMetaTag("meta[name='twitter:image']", 'content', image || 'https://arunaradiosandfurniture.com/logo.png');
+    setMetaTag(
+      "meta[property='og:description']",
+      'content',
+      metaDescription
+    );
 
-    // Canonical Tag
-    let canonicalTag = document.querySelector("link[rel='canonical']");
+    setMetaTag(
+      "meta[property='og:image']",
+      'content',
+      metaImage
+    );
+
+    // Twitter
+    setMetaTag(
+      "meta[name='twitter:title']",
+      'content',
+      fullTitle
+    );
+
+    setMetaTag(
+      "meta[name='twitter:description']",
+      'content',
+      metaDescription
+    );
+
+    setMetaTag(
+      "meta[name='twitter:image']",
+      'content',
+      metaImage
+    );
+
+    // Canonical
+    const canonicalTag =
+      document.querySelector("link[rel='canonical']");
+
     if (canonicalTag) {
-      canonicalTag.setAttribute('href', canonicalUrl || window.location.href);
+      const canonical =
+        canonicalUrl ||
+        `${window.location.origin}${window.location.pathname}`;
+
+      canonicalTag.setAttribute('href', canonical);
     }
 
-    // Smooth Scroll to Top on route change
+    // Scroll to top on route change
     window.scrollTo(0, 0);
-  }, [title, description, keywords, image, canonicalUrl]);
+  }, [title, description, image, canonicalUrl,noindex]);
 
   return null;
 };

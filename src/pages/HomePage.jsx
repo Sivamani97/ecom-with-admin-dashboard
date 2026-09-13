@@ -126,10 +126,10 @@ export const HomePage = ({ onOpenEnquiry }) => {
 
   return (
     <>
-      <SEO
-        title="Home - Quality Products & Best Prices"
-        description="Serving Jayankondam since 1949 with trusted home electronics, kitchen appliances, and quality furniture. Visit our showroom near Bus Stand, Jayankondam."
-      />
+     <SEO
+  title="Electronics, Home Appliances & Furniture"
+  description="Aruna Radios & Furniture is a trusted electronics, home appliances and furniture showroom in Jayankondam, Tamil Nadu. Shop TVs, refrigerators, washing machines, kitchen appliances and quality furniture."
+/>
 
       {/* Hero Section */}
       <section className="hero-section">

@@ -21,9 +21,9 @@ export const AboutPage = ({ onOpenEnquiry }) => {
   return (
     <>
       <SEO
-        title="About Us - Trusted in Jayankondam Since 1949"
-        description="Serving Jayankondam with trust since 1949. Learn about our 75+ year heritage of providing quality home appliances, electronics, and durable furniture."
-      />
+  title="About Aruna Radios & Furniture"
+  description="Learn about Aruna Radios & Furniture, a trusted showroom serving Jayankondam, Tamil Nadu since 1949 with electronics, home appliances and quality furniture."
+/>
 
       <BackButton label="Back to Home" to="/" />
 

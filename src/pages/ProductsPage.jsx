@@ -103,9 +103,9 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
   return (
     <>
       <SEO
-        title="Products Catalog - Furniture, Kitchen & Home Appliances"
-        description="Browse full range of wooden and steel cots, sofas, beros, mixies, grinders, gas stoves, water heaters, fans and inverter batteries in Jayankondam."
-      />
+  title="Furniture, Kitchen Appliances & Electronics"
+  description="Explore furniture, kitchen appliances, home appliances and electronics at Aruna Radios & Furniture in Jayankondam. Shop cots, sofas, beros, mixies, grinders, gas stoves, water heaters, fans and more."
+/>
 
       <BackButton label="Back to Home" to="/" />
 

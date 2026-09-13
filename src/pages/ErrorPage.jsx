@@ -9,9 +9,10 @@ export const ErrorPage = () => {
   return (
     <>
       <SEO
-        title="Page Not Found - Aruna Radios & Furniture"
-        description="The page you are looking for might have been moved or is temporarily unavailable. Return to Aruna Radios & Furniture home."
-      />
+  title="Page Not Found"
+  description="The page you are looking for could not be found. Visit Aruna Radios & Furniture in Jayankondam to explore our products and offers."
+  noindex={true}
+/>
 
       <section className="section-padding" style={{ minHeight: '65vh', display: 'flex', alignItems: 'center' }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '640px' }}>
