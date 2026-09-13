@@ -23,6 +23,7 @@ import { InstagramIcon } from '../components/SocialIcons';
 import { SEO } from '../components/SEO';
 import { BrandMarquee } from '../components/BrandMarquee';
 import { CustomerFeedback } from '../components/CustomerFeedback';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 import { useBusinessSettings } from '../context/BusinessSettingsContext';
 import { api } from '../lib/api';
 const logoImg = "/logo.png";
@@ -219,18 +220,24 @@ export const HomePage = ({ onOpenEnquiry }) => {
                 </Link>
               </div>
 
-              {/* Trust Stats Strip */}
+              {/* Trust Stats Strip with Count-Up Animation */}
               <div className="hero-stats-strip">
                 <div className="stat-item">
-                  <span className="stat-value">75+</span>
+                  <span className="stat-value">
+                    <AnimatedCounter end={75} suffix="+" />
+                  </span>
                   <span className="stat-label">Years of Trust</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-value">10,000+</span>
+                  <span className="stat-value">
+                    <AnimatedCounter end={10000} suffix="+" />
+                  </span>
                   <span className="stat-label">Happy Families</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-value">25+</span>
+                  <span className="stat-value">
+                    <AnimatedCounter end={25} suffix="+" />
+                  </span>
                   <span className="stat-label">Top Brands</span>
                 </div>
               </div>
@@ -324,33 +331,67 @@ export const HomePage = ({ onOpenEnquiry }) => {
         </div>
       </section>
 
-      {/* Short About Us Teaser */}
+      {/* Front Page Trust & Value Feature Section */}
       <section className="section-padding">
         <div className="container">
           <div style={{
             background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 100%)',
             borderRadius: 'var(--radius-xl)',
-            padding: '2.25rem',
+            padding: '2.5rem 2rem',
             border: '1px solid var(--border-color)',
             boxShadow: 'var(--shadow-md)'
           }}>
-            <div className="section-badge">Our Legacy Since 1949</div>
-            <h2 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '0.85rem', color: 'var(--text-primary)' }}>
-              Serving Jayankondam with Trust for Over 7 Decades
+            <div className="section-badge">Why Jayankondam Chooses Us</div>
+            <h2 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '1.25rem', color: 'var(--text-primary)' }}>
+              Built on Quality, Loved by Jayankondam
             </h2>
-            <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: '1.5rem', maxWidth: '880px' }}>
-              Serving Jayankondam with trust since 1949, <strong>Aruna Radios &amp; Furniture</strong> is a trusted destination for quality home appliances, electronics, and furniture. From modern home appliances and the latest electronics to stylish and comfortable furniture, we offer everything you need to make your home smarter, more comfortable, and more beautiful.
-            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
+              <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: 'rgba(217, 119, 6, 0.12)', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                  <Sparkles size={22} />
+                </div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.35rem', color: 'var(--text-primary)' }}>
+                  Quality Products at the Best Price
+                </h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                  Top brand electronics, kitchen appliances, and durable furniture at unmatchable transparent prices.
+                </p>
+              </div>
+
+              <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                  <ShieldCheck size={22} />
+                </div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.35rem', color: 'var(--text-primary)' }}>
+                  Supported by the People of Jayankondam
+                </h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                  Three generations of local trust, continuous support, and genuine community relationships since 1949.
+                </p>
+              </div>
+
+              <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: 'rgba(22, 163, 74, 0.12)', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                  <CheckCircle2 size={22} />
+                </div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.35rem', color: 'var(--text-primary)' }}>
+                  Customer Satisfaction Is Our Satisfaction
+                </h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                  Dedicated after-sales assistance, free doorstep guidance, and 100% brand warranty backing.
+                </p>
+              </div>
+            </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
               <Link to="/about" className="btn btn-primary">
                 <span>Read Full History</span>
                 <ArrowRight size={16} />
               </Link>
-
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-gold-dark)', fontWeight: 800, fontSize: '0.88rem' }}>
                 <CheckCircle2 size={17} />
-                <span>100% Brand Warranty &amp; Doorstep Delivery</span>
+                <span>100% Brand Warranty</span>
               </div>
             </div>
           </div>

@@ -30,13 +30,18 @@ export const ImageCropModal = ({ isOpen, onClose, onImageProcessed, initialImage
   const imageRef = useRef(null);
 
   useEffect(() => {
-    if (initialImageUrl) {
-      setImageSrc(initialImageUrl);
+    if (isOpen) {
+      setImageSrc(initialImageUrl || null);
+      setZoom(1);
+      setRotation(0);
+      setOffset({ x: 0, y: 0 });
+      setError(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } else {
+      setImageSrc(null);
     }
-    setZoom(1);
-    setRotation(0);
-    setOffset({ x: 0, y: 0 });
-    setError(null);
   }, [isOpen, initialImageUrl]);
 
   if (!isOpen) return null;

@@ -275,8 +275,11 @@ export const DashboardPage = () => {
             <Gift size={24} />
           </div>
           <div style={{ flex: 1 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 0.2rem 0', color: 'var(--admin-text-main)' }}>Manage Offers</h3>
-            <p style={{ fontSize: '0.82rem', color: 'var(--admin-text-muted)', margin: 0 }}>Update festival deals, combo offers, and popup promo</p>
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 0.2rem 0', color: 'var(--admin-text-main)' }}>Manage Offers &amp; Banners</h3>
+            <p style={{ fontSize: '0.82rem', color: 'var(--admin-text-muted)', margin: '0 0 0.25rem 0' }}>Update festival deals, combo offers, and popup promo</p>
+            <span style={{ fontSize: '0.72rem', color: '#0369a1', backgroundColor: '#e0f2fe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 700, display: 'inline-block' }}>
+              📐 Banner Spec: 1200×500px Desktop | 600×400px Mobile
+            </span>
           </div>
           <ArrowRight size={18} color="var(--admin-text-muted)" />
         </Link>

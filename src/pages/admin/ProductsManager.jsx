@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { getAdminSession, interpretSupabaseError } from '../../lib/adminAuth';
@@ -28,6 +28,10 @@ export const ProductsManager = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('products'); // 'products' | 'categories'
 
+  // Ref for hidden file input to trigger native gallery/file picker directly for New Product
+  const newProductFileInputRef = useRef(null);
+  const [cropInitialImage, setCropInitialImage] = useState(null);
+
   // Products State
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -41,7 +45,7 @@ export const ProductsManager = () => {
   const [productFormLoading, setProductFormLoading] = useState(false);
   const [productError, setProductError] = useState(null);
 
-  // Simplified 7-field Product Form State
+  // Simplified Product Form State
   const [productFormData, setProductFormData] = useState({
     name: '',
     brand: '',
@@ -99,18 +103,19 @@ export const ProductsManager = () => {
     fetchData();
   }, []);
 
-  // Handle URL ?action=new to automatically open Add modal
+  // Handle URL ?action=new to automatically trigger fresh New Product workflow
   useEffect(() => {
     if (searchParams.get('action') === 'new' && categories.length > 0) {
-      openAddProductModal();
+      handleStartNewProduct();
       setSearchParams({});
     }
   }, [searchParams, categories]);
 
-  // Open Add Product Modal
-  const openAddProductModal = () => {
+  // Workflow 1: New Product Flow (Triggers Native Gallery / File Picker immediately)
+  const handleStartNewProduct = () => {
     setEditingProduct(null);
     setProductError(null);
+    setCropInitialImage(null);
     setProductFormData({
       name: '',
       brand: '',
@@ -119,13 +124,49 @@ export const ProductsManager = () => {
       featured: false,
       is_visible: true
     });
-    setIsProductModalOpen(true);
+
+    // Reset file input and trigger native Gallery/File Picker immediately
+    if (newProductFileInputRef.current) {
+      newProductFileInputRef.current.value = '';
+      newProductFileInputRef.current.click();
+    } else {
+      setIsProductModalOpen(true);
+    }
   };
 
-  // Open Edit Product Modal
+  // Handle direct file selection from native Gallery/File Picker for New Product
+  const handleNewProductFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      // If user cancelled file picker, open New Product Editor modal with clean state
+      setIsProductModalOpen(true);
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (JPG, PNG, WebP).', true);
+      setIsProductModalOpen(true);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (loadEvent) => {
+      const selectedDataUrl = loadEvent.target?.result;
+      if (selectedDataUrl) {
+        setCropInitialImage(selectedDataUrl);
+        setIsCropModalOpen(true);
+      } else {
+        setIsProductModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Workflow 2: Edit Existing Product Flow
   const openEditProductModal = (prod) => {
     setEditingProduct(prod);
     setProductError(null);
+    setCropInitialImage(null);
     setProductFormData({
       name: prod.name || '',
       brand: prod.brand || '',
@@ -135,6 +176,20 @@ export const ProductsManager = () => {
       is_visible: prod.is_visible !== false
     });
     setIsProductModalOpen(true);
+  };
+
+  // Open Crop Modal from inside Product Editor (Replace Image vs Upload New)
+  const openCropModalFromEditor = () => {
+    if (productFormData.image_url) {
+      setCropInitialImage(productFormData.image_url);
+      setIsCropModalOpen(true);
+    } else if (newProductFileInputRef.current) {
+      newProductFileInputRef.current.value = '';
+      newProductFileInputRef.current.click();
+    } else {
+      setCropInitialImage(null);
+      setIsCropModalOpen(true);
+    }
   };
 
   // Save Product (Create or Update)
@@ -456,11 +511,11 @@ export const ProductsManager = () => {
 
           {activeTab === 'products' ? (
             <button 
-              onClick={openAddProductModal}
+              onClick={handleStartNewProduct}
               className="admin-btn admin-btn-primary"
             >
               <Plus size={16} />
-              <span>+ Add Product</span>
+              <span>Add Product</span>
             </button>
           ) : (
             <button 
@@ -543,7 +598,7 @@ export const ProductsManager = () => {
                   ? 'Try adjusting your search query or category filter.'
                   : 'Start by adding your first showroom model with a clean photo.'}
               </p>
-              <button onClick={openAddProductModal} className="admin-btn admin-btn-primary">
+              <button onClick={handleStartNewProduct} className="admin-btn admin-btn-primary">
                 <Plus size={16} />
                 <span>Add Product</span>
               </button>
@@ -769,12 +824,12 @@ export const ProductsManager = () => {
                   </div>
                 )}
 
-                {/* 1. Product Image Field (Opens Crop Editor) */}
+                {/* 1. Product Image Field (Opens Crop Editor / File Picker) */}
                 <div className="admin-form-group">
                   <label className="admin-label">Product Image</label>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <div 
-                      onClick={() => setIsCropModalOpen(true)}
+                      onClick={openCropModalFromEditor}
                       style={{
                         width: '100px',
                         height: '75px',
@@ -803,7 +858,7 @@ export const ProductsManager = () => {
                     <div style={{ flex: 1 }}>
                       <button
                         type="button"
-                        onClick={() => setIsCropModalOpen(true)}
+                        onClick={openCropModalFromEditor}
                         className="admin-btn admin-btn-secondary admin-btn-sm"
                         style={{ width: '100%', justifyContent: 'flex-start' }}
                       >
@@ -811,7 +866,7 @@ export const ProductsManager = () => {
                         <span>{productFormData.image_url ? 'Change Photo' : 'Upload Photo'}</span>
                       </button>
                       <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', margin: '0.35rem 0 0 0' }}>
-                        Opens crop editor & uploads to Supabase Storage
+                        Opens native gallery & crop editor
                       </p>
                     </div>
                   </div>
@@ -1015,14 +1070,30 @@ export const ProductsManager = () => {
         </div>
       )}
 
+      {/* Hidden File Input for Direct Native Gallery / File Picker Selection on New Product */}
+      <input
+        type="file"
+        id="new-product-direct-file-input"
+        ref={newProductFileInputRef}
+        onChange={handleNewProductFileSelect}
+        accept="image/*,image/jpeg,image/png,image/webp,image/heic,image/heif"
+        style={{ display: 'none' }}
+      />
+
       {/* ================= IMAGE CROP & UPLOAD MODAL ================= */}
       <ImageCropModal
         isOpen={isCropModalOpen}
-        onClose={() => setIsCropModalOpen(false)}
-        initialImageUrl={productFormData.image_url}
+        onClose={() => {
+          setIsCropModalOpen(false);
+          setCropInitialImage(null);
+          setIsProductModalOpen(true);
+        }}
+        initialImageUrl={cropInitialImage || productFormData.image_url}
         onImageProcessed={(publicUrl) => {
           setProductFormData((prev) => ({ ...prev, image_url: publicUrl }));
-          showToast('Image cropped & uploaded to Supabase Storage!');
+          setCropInitialImage(null);
+          setIsProductModalOpen(true);
+          showToast('Image attached to product!');
         }}
       />
     </div>

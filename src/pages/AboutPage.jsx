@@ -64,9 +64,7 @@ export const AboutPage = ({ onOpenEnquiry }) => {
         <div className="container">
           <div className="about-content-block">
             {/* Primary Verbatim Lead */}
-            <p className="about-lead">
-              Serving Jayankondam with trust since 1949, <strong>Aruna Radios &amp; Furniture</strong> is a trusted destination for quality home appliances, electronics, and furniture. From modern home appliances and the latest electronics to stylish and comfortable furniture, we offer everything you need to make your home smarter, more comfortable, and more beautiful.
-            </p>
+            
 
             {/* Structured Verbatim Pillars */}
             <div className="pillar-grid">
@@ -102,6 +100,9 @@ export const AboutPage = ({ onOpenEnquiry }) => {
                   Your happiness is our greatest achievement. We are dedicated to providing quality products, value for money, and a satisfying shopping experience to every customer.
                 </p>
               </div>
+              <p className="about-lead">
+              Serving Jayankondam with trust since 1949, <strong>Aruna Radios &amp; Furniture</strong> is a trusted destination for quality home appliances, electronics, and furniture. From modern home appliances and the latest electronics to stylish and comfortable furniture, we offer everything you need to make your home smarter, more comfortable, and more beautiful.
+            </p>
             </div>
           </div>
 
@@ -184,7 +185,7 @@ export const AboutPage = ({ onOpenEnquiry }) => {
                   <div>
                     <h4 style={{ fontSize: '1.05rem', fontWeight: 800, marginBottom: '0.25rem' }}>Modern Comprehensive Home Showroom</h4>
                     <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                      Everything under one roof: Smart LED TVs, BLDC Fans, Inverters, Teakwood furniture, and digital appliances with doorstep delivery and warranty backing across Jayankondam, Gangaikonda Cholapuram, Andimadam, and Ariyalur.
+                      Everything under one roof: Smart LED TVs, BLDC Fans, Inverters, Teakwood furniture, and digital appliances with warranty backing across Jayankondam, Gangaikonda Cholapuram, Andimadam, and Ariyalur.
                     </p>
                   </div>
                 </div>

@@ -487,18 +487,51 @@ export const OffersManager = () => {
           />
         </div>
 
-        {/* Offer Banner Image */}
-        <div className="admin-form-group">
-          <label className="admin-label">Offer Banner Image (Optional)</label>
+        {/* Offer Banner Image & Dimension Specs */}
+        <div className="admin-form-group" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <label className="admin-label" style={{ margin: 0, fontWeight: 800 }}>Offer Banner Image (Optional)</label>
+            <span style={{ fontSize: '0.75rem', color: '#0369a1', backgroundColor: '#e0f2fe', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
+              📐 Recommended Sizes
+            </span>
+          </div>
+
+          {/* Banner Dimension Spec Box */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '0.75rem',
+            marginBottom: '1rem',
+            padding: '0.75rem',
+            backgroundColor: '#ffffff',
+            borderRadius: '8px',
+            border: '1px solid #cbd5e1',
+            fontSize: '0.82rem',
+            color: '#334155'
+          }}>
+            <div>
+              <strong style={{ color: '#0f172a', display: 'block' }}>🖥️ Desktop View Banner:</strong>
+              <span>Recommended: <strong>1200 × 500 px</strong> (12:5 ratio)</span>
+            </div>
+            <div>
+              <strong style={{ color: '#0f172a', display: 'block' }}>📱 Mobile View Banner:</strong>
+              <span>Recommended: <strong>600 × 400 px</strong> (3:2 ratio)</span>
+            </div>
+            <div>
+              <strong style={{ color: '#0f172a', display: 'block' }}>📁 Format &amp; File Limit:</strong>
+              <span>JPG, PNG, WebP (Max size: <strong>2 MB</strong>)</span>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <div
               onClick={() => setIsCropModalOpen(true)}
               style={{
-                width: '100px',
-                height: '75px',
+                width: '120px',
+                height: '80px',
                 borderRadius: '8px',
                 border: '1.5px dashed var(--admin-border)',
-                backgroundColor: '#f1f5f9',
+                backgroundColor: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -522,6 +555,9 @@ export const OffersManager = () => {
                 <Upload size={14} />
                 <span>{offer.image_url ? 'Replace Offer Photo' : 'Upload Offer Photo'}</span>
               </button>
+              <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0.35rem 0 0 0' }}>
+                Images are automatically cropped and optimized for fast display across mobile and desktop.
+              </p>
             </div>
           </div>
         </div>

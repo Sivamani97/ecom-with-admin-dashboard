@@ -9,7 +9,8 @@ import {
   SlidersHorizontal,
   X,
   Info,
-  ChevronDown
+  ChevronDown,
+  MapPin
 } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import { BackButton } from '../components/BackButton';
@@ -366,7 +367,7 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
 
               <div style={{
                 background: 'var(--bg-tertiary)',
-                padding: '1rem',
+                padding: '0.85rem 1rem',
                 borderRadius: 'var(--radius-md)',
                 marginBottom: '1.25rem',
                 border: '1px solid var(--border-color)'
@@ -376,10 +377,14 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
                   <span>{selectedProductDetail.warranty || 'Official Brand Warranty'}</span>
                 </div>
                 {selectedProductDetail.highlight && (
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
+                  <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
                     {selectedProductDetail.highlight}
                   </p>
                 )}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.82rem', color: 'var(--text-primary)', borderTop: '1px solid var(--border-color)', paddingTop: '0.55rem', marginTop: '0.5rem' }}>
+                  <MapPin size={15} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <span><strong>Store Address:</strong> 103A, bazaar street, Jayankondam. Opposite to PVR lodge</span>
+                </div>
               </div>
 
               {Array.isArray(selectedProductDetail.features) && selectedProductDetail.features.length > 0 && (

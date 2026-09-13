@@ -18,12 +18,12 @@ export const SITE_CONFIG = {
     whatsapp: "919443254321", // international format without +
     email: "arunaradios.jayankondam@gmail.com",
     address: {
-      line1: "Near Bus Stand, Main Road",
-      line2: "Kachirayanpalayam Road Junction",
+      line1: "103A, Bazaar Street",
+      line2: "Opposite to PVR Lodge",
       city: "Jayankondam",
       state: "Tamil Nadu",
       pincode: "621802",
-      landmark: "Opposite to Taluk Office, Jayankondam"
+      landmark: "Opposite to PVR Lodge, Jayankondam"
     },
     hours: {
       weekday: "Monday – Saturday: 9:00 AM – 9:00 PM",
