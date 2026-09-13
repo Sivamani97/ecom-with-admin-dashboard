@@ -12,7 +12,10 @@ import {
   Save, 
   RefreshCw,
   MessageSquare,
-  Share2
+  Share2,
+  Lock,
+  KeyRound,
+  ShieldCheck
 } from 'lucide-react';
 
 export const SettingsManager = () => {
@@ -20,6 +23,16 @@ export const SettingsManager = () => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+
+  // Password change state
+  const [passState, setPassState] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passSaving, setPassSaving] = useState(false);
+  const [passSuccess, setPassSuccess] = useState(false);
+  const [passError, setPassError] = useState(null);
 
   // Business settings state
   const [settings, setSettings] = useState({
@@ -77,7 +90,6 @@ export const SettingsManager = () => {
     setError(null);
 
     try {
-      // Verify admin session before any write operation
       const authCheck = await getAdminSession();
       if (!authCheck.isAdmin) {
         setError(authCheck.error || 'Admin authorization required. Please log in again.');
@@ -105,7 +117,6 @@ export const SettingsManager = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Upsert on config_key — works whether a row exists or not
       const { data: upserted, error: upsertErr } = await supabase
         .from('business_settings')
         .upsert(payload, { onConflict: 'config_key' })
@@ -125,13 +136,66 @@ export const SettingsManager = () => {
     }
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPassSaving(true);
+    setPassSuccess(false);
+    setPassError(null);
+
+    if (passState.newPassword.length < 6) {
+      setPassError('New password must be at least 6 characters long.');
+      setPassSaving(false);
+      return;
+    }
+
+    if (passState.newPassword !== passState.confirmPassword) {
+      setPassError('New password and confirm password do not match.');
+      setPassSaving(false);
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !user.email) {
+        throw new Error('Could not identify active user session. Please sign out and sign in again.');
+      }
+
+      // Verify old password by attempting re-authentication
+      const { error: verifyErr } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: passState.oldPassword
+      });
+
+      if (verifyErr) {
+        setPassError('Current / Old password is incorrect. Please double check your current password.');
+        setPassSaving(false);
+        return;
+      }
+
+      // Update user password in Supabase Auth
+      const { error: updateErr } = await supabase.auth.updateUser({
+        password: passState.newPassword
+      });
+
+      if (updateErr) throw updateErr;
+
+      setPassSuccess(true);
+      setPassState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => setPassSuccess(false), 4500);
+    } catch (err) {
+      setPassError(err.message || 'Failed to update admin password.');
+    } finally {
+      setPassSaving(false);
+    }
+  };
+
   return (
     <div>
       {/* Page Header */}
       <div className="admin-page-header">
         <div className="admin-page-title-group">
-          <h1>Business Settings</h1>
-          <p>Update official store contact info, WhatsApp number, working hours, and map location</p>
+          <h1>Business Settings &amp; Security</h1>
+          <p>Update store details, contact info, working hours, and change admin account password</p>
         </div>
 
         <div className="admin-page-actions">
@@ -176,7 +240,7 @@ export const SettingsManager = () => {
         <div className="admin-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--admin-border)' }}>
             <Building2 size={20} color="var(--admin-primary-accent)" />
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>1. Business Information & Address</h2>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>1. Business Information &amp; Address</h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
@@ -251,7 +315,7 @@ export const SettingsManager = () => {
         <div className="admin-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--admin-border)' }}>
             <Phone size={20} color="var(--admin-primary-accent)" />
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>2. Contact & WhatsApp Numbers</h2>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>2. Contact &amp; WhatsApp Numbers</h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
@@ -340,7 +404,7 @@ export const SettingsManager = () => {
         <div className="admin-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--admin-border)' }}>
             <Share2 size={20} color="var(--admin-primary-accent)" />
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>4. Social Links & Google Maps</h2>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>4. Social Links &amp; Google Maps</h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -379,8 +443,8 @@ export const SettingsManager = () => {
           </div>
         </div>
 
-        {/* Submit */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '2rem' }}>
+        {/* Submit Business Info */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
           <button
             type="submit"
             disabled={saving}
@@ -391,6 +455,90 @@ export const SettingsManager = () => {
           </button>
         </div>
       </form>
+
+      {/* Section 5: Admin Account Security & Password Change */}
+      <div className="admin-card" style={{ marginTop: '2rem', border: '1px solid #cbd5e1' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--admin-border)' }}>
+          <KeyRound size={20} color="var(--admin-primary-accent)" />
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>5. Admin Security: Change Account Password</h2>
+        </div>
+
+        {passSuccess && (
+          <div style={{ marginBottom: '1.25rem', backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', color: '#065f46', padding: '0.85rem', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid #a7f3d0' }}>
+            <Check size={18} />
+            <strong style={{ fontSize: '0.9rem' }}>Password updated successfully! Use your new password for your next login.</strong>
+          </div>
+        )}
+
+        {passError && (
+          <div style={{ marginBottom: '1.25rem', backgroundColor: '#fef2f2', borderColor: '#fecaca', color: '#991b1b', padding: '0.85rem', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid #fecaca' }}>
+            <AlertCircle size={18} />
+            <strong style={{ fontSize: '0.9rem' }}>{passError}</strong>
+          </div>
+        )}
+
+        <form onSubmit={handleChangePassword}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+            <div className="admin-form-group">
+              <label className="admin-label">Current / Old Password *</label>
+              <input
+                type="password"
+                required
+                placeholder="Enter current password"
+                value={passState.oldPassword}
+                onChange={(e) => setPassState({ ...passState, oldPassword: e.target.value })}
+                className="admin-input"
+              />
+            </div>
+
+            <div className="admin-form-group">
+              <label className="admin-label">New Password *</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                placeholder="Minimum 6 characters"
+                value={passState.newPassword}
+                onChange={(e) => setPassState({ ...passState, newPassword: e.target.value })}
+                className="admin-input"
+              />
+            </div>
+
+            <div className="admin-form-group">
+              <label className="admin-label">Confirm New Password *</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                placeholder="Re-enter new password"
+                value={passState.confirmPassword}
+                onChange={(e) => setPassState({ ...passState, confirmPassword: e.target.value })}
+                className="admin-input"
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              type="submit"
+              disabled={passSaving}
+              className="admin-btn admin-btn-primary"
+            >
+              {passSaving ? (
+                <>
+                  <RefreshCw size={16} className="spin-anim" />
+                  <span>Updating Password...</span>
+                </>
+              ) : (
+                <>
+                  <Lock size={16} />
+                  <span>Update Password</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
