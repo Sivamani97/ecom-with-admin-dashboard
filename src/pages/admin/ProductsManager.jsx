@@ -52,7 +52,8 @@ export const ProductsManager = () => {
     category_id: '',
     image_url: '',
     featured: false,
-    is_visible: true
+    is_visible: true,
+    has_brand_warranty: true
   });
 
   // Image Crop Modal
@@ -122,7 +123,8 @@ export const ProductsManager = () => {
       category_id: categories[0]?.id || '',
       image_url: '',
       featured: false,
-      is_visible: true
+      is_visible: true,
+      has_brand_warranty: true
     });
 
     // Reset file input and trigger native Gallery/File Picker immediately
@@ -173,7 +175,8 @@ export const ProductsManager = () => {
       category_id: prod.category_id,
       image_url: prod.image_url || '',
       featured: !!prod.featured,
-      is_visible: prod.is_visible !== false
+      is_visible: prod.is_visible !== false,
+      has_brand_warranty: prod.has_brand_warranty !== false
     });
     setIsProductModalOpen(true);
   };
@@ -223,6 +226,7 @@ export const ProductsManager = () => {
         image_url: productFormData.image_url || null,
         featured: productFormData.featured,
         is_visible: productFormData.is_visible,
+        has_brand_warranty: productFormData.has_brand_warranty,
         updated_at: new Date().toISOString()
       };
 
@@ -942,6 +946,24 @@ export const ProductsManager = () => {
                         type="checkbox"
                         checked={productFormData.is_visible}
                         onChange={(e) => setProductFormData({ ...productFormData, is_visible: e.target.checked })}
+                      />
+                      <span className="admin-slider" />
+                    </div>
+                  </label>
+                </div>
+
+                {/* 7. Official Brand Warranty Toggle */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label className="admin-toggle-wrap">
+                    <div className="admin-toggle-info">
+                      <span className="admin-toggle-title">Official Brand Warranty</span>
+                      <span className="admin-toggle-desc">Show Official Brand Warranty badge on product details</span>
+                    </div>
+                    <div className="admin-switch">
+                      <input
+                        type="checkbox"
+                        checked={productFormData.has_brand_warranty}
+                        onChange={(e) => setProductFormData({ ...productFormData, has_brand_warranty: e.target.checked })}
                       />
                       <span className="admin-slider" />
                     </div>

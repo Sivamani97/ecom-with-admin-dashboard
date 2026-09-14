@@ -81,6 +81,7 @@ CREATE TABLE public.products (
     tag TEXT,
     features TEXT[] DEFAULT '{}',
     warranty TEXT,
+    has_brand_warranty BOOLEAN DEFAULT true,
     
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

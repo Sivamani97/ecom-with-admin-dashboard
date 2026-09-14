@@ -112,7 +112,7 @@ export const HomePage = ({ onOpenEnquiry }) => {
       desc: "BLDC fans, geysers & inverter combos",
       link: "/products?category=home-appliances",
       badge: `${getCategoryCount('home-appliances') + getCategoryCount('tv')} Models`,
-      image: "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=600&auto=format&fit=crop&q=80"
+      image: "https://media.istockphoto.com/id/1211554164/photo/3d-render-of-home-appliances-collection-set.jpg?s=2048x2048&w=is&k=20&c=T44JxeSxZQlr_SCb34r_uPzdLJ9T52Gikwyke9OjH7c="
     },
     {
       id: "offers",

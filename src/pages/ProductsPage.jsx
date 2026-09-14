@@ -365,27 +365,27 @@ export const ProductsPage = ({ onOpenEnquiry }) => {
                 />
               </div>
 
-              <div style={{
-                background: 'var(--bg-tertiary)',
-                padding: '0.85rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                marginBottom: '1.25rem',
-                border: '1px solid var(--border-color)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-gold-dark)', fontWeight: 700, fontSize: '0.88rem', marginBottom: '0.35rem' }}>
-                  <ShieldCheck size={18} />
-                  <span>{selectedProductDetail.warranty || 'Official Brand Warranty'}</span>
+              {(selectedProductDetail.has_brand_warranty !== false || selectedProductDetail.highlight) && (
+                <div style={{
+                  background: 'var(--bg-tertiary)',
+                  padding: '0.85rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  marginBottom: '1.25rem',
+                  border: '1px solid var(--border-color)'
+                }}>
+                  {selectedProductDetail.has_brand_warranty !== false && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-gold-dark)', fontWeight: 700, fontSize: '0.88rem', marginBottom: selectedProductDetail.highlight ? '0.35rem' : '0' }}>
+                      <ShieldCheck size={18} />
+                      <span>{selectedProductDetail.warranty || 'Official Brand Warranty'}</span>
+                    </div>
+                  )}
+                  {selectedProductDetail.highlight && (
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0 }}>
+                      {selectedProductDetail.highlight}
+                    </p>
+                  )}
                 </div>
-                {selectedProductDetail.highlight && (
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                    {selectedProductDetail.highlight}
-                  </p>
-                )}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.82rem', color: 'var(--text-primary)', borderTop: '1px solid var(--border-color)', paddingTop: '0.55rem', marginTop: '0.5rem' }}>
-                  <MapPin size={15} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <span><strong>Store Address:</strong> 103A, bazaar street, Jayankondam. Opposite to PVR lodge</span>
-                </div>
-              </div>
+              )}
 
               {Array.isArray(selectedProductDetail.features) && selectedProductDetail.features.length > 0 && (
                 <>
