@@ -64,7 +64,7 @@ Aruna Electronics/
 ├── public/
 │   ├── brands/                # Official rounded circular SVG logos (20 brands)
 │   ├── logo.png               # High-res official business logo
-│   ├── favicon.svg            # Site favicon
+│   ├── favicon.png            # Site favicon (PNG format)
 │   ├── robots.txt             # Search engine crawling rules
 │   └── sitemap.xml            # XML sitemap for SEO
 ├── src/
